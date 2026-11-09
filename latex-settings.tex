@@ -1,0 +1,63 @@
+% Adapted from the supplied Overleaf settings; standard pdfLaTeX only.
+\usepackage[a4paper,headheight=18pt,top=25mm,bottom=25mm,left=25mm,right=25mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,polish]{babel}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{amsmath,amsfonts}
+\usepackage{graphicx}
+\usepackage{array,tabularx,booktabs}
+\usepackage{caption}
+\usepackage{listings}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\selectlanguage{polish}
+\frenchspacing
+\urlstyle{same}
+\hypersetup{pdftitle={Predykcja pit stopów w Formule 1},pdfauthor={Aleksander Łyskawa, Artur Kręgiel, Michał Klamecki}}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\emergencystretch=2em
+\brokenpenalty=10000
+\clubpenalty=10000
+\widowpenalty=10000
+\captionsetup{font=small,labelfont=bf}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcommand{\code}[1]{\texttt{\detokenize{#1}}}
+
+% Keep the supplied serif chapter/section conventions and restrained rules.
+\titleformat{\chapter}[hang]{\normalfont\Huge\bfseries}{\thechapter.}{1ex}{}
+\titlespacing*{\chapter}{0pt}{0pt}{22pt}
+\titleformat{\section}[hang]{\normalfont\Large\bfseries}{\thesection.}{1ex}{}
+\titleformat{\subsection}[hang]{\normalfont\large\bfseries}{\thesubsection.}{1ex}{}
+\fancypagestyle{custom}{%
+  \fancyhf{}
+  \fancyhead[L]{\small Politechnika Wrocławska}
+  \fancyhead[R]{\small Rozdział \thechapter}
+  \fancyfoot[R]{\thepage}
+  \renewcommand{\headrulewidth}{0.2pt}
+  \renewcommand{\footrulewidth}{0.2pt}}
+\fancypagestyle{plain}{%
+  \fancyhf{}\fancyfoot[R]{\thepage}
+  \renewcommand{\headrulewidth}{0pt}
+  \renewcommand{\footrulewidth}{0.2pt}}
+\fancypagestyle{tableOfContentStyle}{%
+  \fancyhf{}\fancyfoot[R]{\thepage}
+  \renewcommand{\headrulewidth}{0pt}
+  \renewcommand{\footrulewidth}{0.2pt}}
+\fancypagestyle{bibliographyStyle}{%
+  \fancyhf{}\fancyhead[L]{\small Politechnika Wrocławska}
+  \fancyhead[R]{\small Bibliografia}\fancyfoot[R]{\thepage}
+  \renewcommand{\headrulewidth}{0.2pt}
+  \renewcommand{\footrulewidth}{0.2pt}}
+\newcommand{\Chapter}[1]{\chapter{#1}\thispagestyle{plain}}
+\lstset{basicstyle=\ttfamily\small,breaklines=true,columns=fullflexible,
+  keepspaces=true,showstringspaces=false,frame=single,captionpos=b,
+  keywordstyle=\bfseries,commentstyle=\itshape}
+\renewcommand{\lstlistingname}{Listing}

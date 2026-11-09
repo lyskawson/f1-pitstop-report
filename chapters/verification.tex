@@ -1,0 +1,125 @@
+\Chapter{Testowanie i weryfikacja}
+\label{ch:verification}
+
+\section{Co sprawdzono}
+
+Testy działają bez internetu dzięki \code{pytest-socket}; połączenia
+internetowe są blokowane, a lokalne gniazda uniksowe pozostają dostępne.
+Fixtures to niewielki, wersjonowany materiał wejściowy do testów.
+Zawierają pełne surowe tabele Bahrajnu 2022 (1125 wierszy) i Arabii
+Saudyjskiej 2022 (820 wierszy), a nie losowo wymyślone próbki zastępujące
+rzeczywiste dane. Oprócz nich testy budują małe przypadki syntetyczne,
+pozwalające celowo uszkodzić pojedynczy warunek.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Zakres istniejących testów i granice ich interpretacji.}
+\label{tab:tests}
+\begin{tabularx}{\textwidth}{L{0.25\textwidth}Y Y}
+\toprule
+Obszar & Sprawdzana własność & Czego wynik nie potwierdza \\
+\midrule
+Kontrakty & Typy, klucze, wartości, zgodność \code{row_id}, kształty i dopełnienie tablic. & Przyczynowości przyszłego generatora cech. \\
+Fixtures i adapter & Odczyt Parquet, zachowanie braków, korekta tekstowych nulli, historyczne numery kierowców. & Kompletności historii opon w pełnym zbiorze. \\
+Snapshot & Pakowanie i odczyt bez cache, niezmienność nazw, reakcja na brak źródeł. & Akceptacji danych do uczenia. \\
+Weryfikator & Zmienione/brakujące pliki, niebezpieczne ścieżki, strumienie i semantyka metadanych. & Prawdziwości każdej wizyty jako wymiany opon. \\
+CLI i konfiguracje & Lista poleceń, kody zakończenia, odczyt YAML, jawne ograniczenie sieci. & Działania niewdrożonych poleceń modelowych. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Zachowany wynik końcowych kontroli autora T2 na rewizji
+\code{e4d484d} podaje 209 poprawnych testów oraz poprawne kontrole Ruff.
+Nie jest to nowy pomiar wykonany podczas pisania raportu. Dowód merge
+wiąże tę rewizję z \code{5ba376f}; CI dla kodu przed scaleniem zakończyło
+się powodzeniem~\cite{t2ci,t2merge}. Weryfikacja świeżo rozpakowanego
+archiwum przez właściwe CLI również zakończyła się kodem 0, przy blokadzie
+FastF1, cache, uwierzytelniania i sieci. Kopie testowe bez zadeklarowanego
+strumienia lub z całkowicie pustą treścią \code{Status}/\code{Message}
+zostały odrzucone kodem 1 mimo zgodnych, przeliczonych skrótów.
+
+Kandydat snapshotu powstał wcześniej na rewizji \code{e96ae05}.
+Nowsza poprawka weryfikatora go nie wytworzyła ponownie, tylko sprawdziła.
+Rewizja producenta danych i rewizja programu weryfikującego są więc
+różnymi elementami pochodzenia. Ich pełne identyfikatory i skróty
+artefaktów znajdują się w mapie dowodów.
+
+\section{Wnioski z kontroli FastF1}
+
+Audyt zachował związek \code{PitInTime} z okrążeniem wjazdowym
+i \code{PitOutTime} z wyjazdowym. Nie stwierdza to jednak, że każdy
+znacznik czasu musi leżeć w granicach zapisanej długości okrążenia.
+Odnotowano 97 znaczników wjazdu późniejszych niż odpowiadający im koniec
+okrążenia. Nie przeniesiono ich arbitralnie do następnego wiersza.
+Reguła przypisywania zdarzeń wymaga zachowania źródłowego kontekstu.
+
+\code{IsAccurate} nie może służyć do wyboru wierszy z etykietą.
+W badanych danych okrążenia wjazdowe i wyjazdowe nie są dokładne według
+tej flagi, więc ich usunięcie zmieniłoby populację zdarzeń. Flaga ma
+maskować tylko cechy czasowe, z przyczynowym przeniesieniem wcześniejszych
+wartości w obrębie wyścigu i kierowcy. To reguła dla przyszłej implementacji,
+nie opis wykonanego przetwarzania.
+
+Istotne jest także dokładne znaczenie statusu SC. Po poprzednim statusie
+równym dokładnie \code{4} wszystkie 2806 obserwowanych wierszy było
+niedokładnych. Po dowolnym statusie zawierającym \code{4}, również
+wielokodowym, 1017 z 5260 wierszy miało \code{IsAccurate=True}.
+Nie wolno uogólnić reguły dla statusu dokładnego na każdy status mieszany.
+Jest to ustalenie audytu FastF1 3.9.0a0, wymagające doprecyzowania
+starszego opisu reguły~\cite{findings}.
+
+\section{Ochrona przed wyciekiem: stan i plan}
+
+Wyciekiem informacji nazywamy wykorzystanie przy prognozie danych, które
+w rzeczywistym momencie jej sporządzania nie były dostępne, albo
+dopasowanie przetwarzania na wydzielonych danych oceny.
+Obecnie działają mechanizmy zachowania surowych obserwacji, znaczników
+czasu, pochodzenia i spójności formatu. Nie ma jeszcze generatora cech
+ani testu obcięcia całego zbioru do $T$. Nagłówek reguł w dokumencie
+decyzji nie stanowi dowodu, że wszystkie przyszłe testy już istnieją.
+
+Docelowa kontrola ma ponownie obliczać cechy po usunięciu obserwacji
+po $T$ ze wszystkich strumieni i od wszystkich kierowców. Wynik musi
+odpowiadać obliczeniu na pełnym wejściu. Osobne testy mają sprawdzać
+przesunięcie etykiety na $t+1$, obojętność na przyszły wjazd rywala,
+nieprzekraczanie granic kierowcy i wyścigu w oknie oraz dopasowanie
+standaryzacji wyłącznie na części uczącej. Wierszy nie wolno wybierać
+za pomocą \code{IsAccurate} ani usuwać na podstawie braku czasu
+okrążenia~\cite{decisions}.
+
+\section{Protokół przyszłych eksperymentów}
+
+Przyjęty podział jest chronologiczny: train obejmuje sezony 2022--2024,
+val rundy 1--12 sezonu 2025, a test rundy 13--24 tego sezonu. Manifest
+podziału ma powstać przed wykluczeniami. Nie przewidziano losowego
+podziału wierszy ani ponownego uczenia na train+val.
+Statystyki standaryzacji mają pochodzić tylko z train i pozostawać
+zamrożone dla val, test oraz późniejszego wnioskowania.
+
+Konfiguracje zakładają porównanie stałej częstości klasy z train,
+regresji logistycznej i LightGBM z perceptronem wielowarstwowym (MLP),
+siecią rekurencyjną z bramkowaną komórką GRU i czasową siecią
+konwolucyjną (TCN).
+MLP ma przetwarzać pojedynczy wektor cech, a GRU i przyczynowa TCN
+okno historii. To plany architektury; nie istnieje jeszcze ich
+\code{forward}, pętla uczenia ani zapis wag. Sieci mają zwracać jeden
+logit, czyli wynik przed funkcją sigmoidalną zamieniającą go na
+prawdopodobieństwo. Referencyjny trening ma używać AdamW i
+\code{BCEWithLogitsLoss} bez zwiększania wagi klasy dodatniej.
+
+Podstawową metryką wyboru modelu będzie Average Precision (AP),
+podawana razem z częstością klasy dodatniej. AP ocenia ranking wyników
+przy zmianie progu decyzji. Próg alarmu ma maksymalizować F1 na val,
+z wyborem większego progu przy remisie, a następnie zostać zamrożony.
+F1 łączy precyzję, czyli udział trafnych alarmów, i czułość, czyli
+udział wykrytych zdarzeń. Dodatkowa ocena zdarzeniowa ma dopuszczać
+wcześniejszy alarm, ale nie alarm spóźniony względem okna etykiety.
+Niepewność ma być oceniana przez wielokrotne losowanie ze zwracaniem
+całych wyścigów (bootstrap), co zachowuje zależności między ich
+okrążeniami~\cite{decisions,contracts}.
+
+Nie przeprowadzono uczenia, porównania modeli ani predykcyjnej oceny
+val/test. Zablokowany test wymaga osobnej zgody człowieka po zamrożeniu
+konfiguracji. Również ewentualne AP lub F1 powyżej 0.6 na val/test wymaga
+audytu wycieku przed publikacją wyników. Analiza jakości danych z tych
+sezonów nie jest predykcyjną oceną na zbiorze testowym.

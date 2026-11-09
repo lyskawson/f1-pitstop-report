@@ -1,0 +1,66 @@
+\Chapter{Odtwarzalność i pochodzenie}
+\label{ch:repro}
+
+\section{Wersje źródeł i dowodów}
+
+Pełna rewizja kodu opisana w raporcie to
+\begin{quote}\small
+\nolinkurl{5ba376f904b58caf2072ce807cc822db7a90ccc6}.
+\end{quote}
+Odczytano pliki wersjonowane dokładnie w tej rewizji, niezależnie od
+bieżącego drzewa roboczego. Kod poprawek T2 przed scaleniem ma SHA
+\code{e4d484d}; producent kandydata danych ma SHA \code{e96ae05}.
+Audyt T0 po poprawkach wykonano na \code{49a38c9}.
+Identyfikatory pełnej długości, selektory liczb i SHA-256 plików dowodowych
+zapisano poza narracją w \code{evidence-map.md} i
+\code{evidence/provenance.json}. Plik \code{evidence/summary.json}
+zawiera wyłącznie wybrane agregaty, bez surowych danych i prywatnych
+dzienników.
+
+Wynik 209 testów pochodzi z dziennika końcowych kontroli T2,
+a pokrycie z \path{reports/T2-evidence/coverage-summary.json}.
+Ustalenia T0 opisuje \path{docs/fastf1-findings.md} i dowód
+\path{reports/T0-fix1-evidence/summary-after.json}.
+Katalog \code{reports/} oznacza wydzielone archiwum dowodowe projektu,
+częściowo niepubliczne. Skróty umożliwiają sprawdzenie tożsamości dowodu,
+ale nie zastępują dostępu do niego. Publiczne źródła wskazano w bibliografii.
+
+Nie powtarzano pobrań, audytu pełnego cache, treningu ani testowej
+ewaluacji modeli na potrzeby napisania raportu. Włączenie kodu do
+\code{main}, wynik testów i akceptacja danych są trzema różnymi stanami.
+
+\section{Odtworzenie środowiska projektu}
+
+Poniższe polecenia dotyczą repozytorium programu w opisanej rewizji.
+Pierwsze przygotowuje środowisko; kolejne kontrole wykorzystują dane
+testowe i blokadę sieci. Nie uruchamiają pobrania danych wyścigowych.
+
+\begin{lstlisting}
+uv sync --locked --extra train
+uv run --offline ruff check .
+uv run --offline ruff format --check .
+uv run --offline pytest
+uv run --offline pitstop --help
+\end{lstlisting}
+
+Osoba mająca właściwe, rozpakowane archiwum może sprawdzić je bez
+cache i poświadczeń:
+\begin{lstlisting}
+uv run --offline --no-sync pitstop verify-data \
+  --manifest data/raw/v1/manifest.json
+\end{lstlisting}
+Ścieżka musi wskazywać manifest wewnątrz wersjonowanego katalogu danych,
+a nie jego oddzielną kopię. Uzyskanie kodu 0 potwierdza zakres kontroli
+weryfikatora; nie zastępuje wymaganej akceptacji człowieka.
+
+\section{Budowanie dokumentu}
+
+Raport jest samodzielny. Plikiem głównym jest \code{main.tex},
+kompilatorem pdfLaTeX, a bibliografię obsługuje BibTeX:
+\begin{lstlisting}
+latexmk -pdf -interaction=nonstopmode \
+  -halt-on-error -outdir=build main.tex
+\end{lstlisting}
+Wynik to \code{build/main.pdf}. Nie potrzeba zewnętrznych danych,
+fontów, sieci ani \code{shell-escape}. Instrukcje Overleaf i aktualizacji
+zawiera anglojęzyczny \code{README.md}.

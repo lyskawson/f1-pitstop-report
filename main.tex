@@ -1,0 +1,71 @@
+\documentclass{report}
+
+\input{latex-settings}
+
+
+\begin{document}
+
+\hypersetup{pageanchor=false}
+\begin{titlepage}
+    \begin{center}
+
+        \vspace*{1cm}
+        \huge
+        \textbf{Projekt}\\
+        \Large Sieci neuronowe
+
+        \vspace{1cm}
+
+        \includegraphics[width=0.4\textwidth]{logoPWr_PL_pion_kolor_v1.png}
+
+        \vspace{1cm}
+
+        % Tytuł dokumentu
+        \Huge
+        \textbf{Predykcja pit stopów w Formule 1}
+
+        % Autorzy Raportu
+        \vspace{1.5cm}
+        \large
+        \begin{tabular}{rl}
+            Skład grupy: & Aleksander Łyskawa (275462) \\
+                         & Artur Kręgiel (272989) \\
+                         & Michał Klamecki (275486) \\[6pt]
+            Prowadzący:  & dr hab. inż. Andrzej Rusiecki \\[6pt]
+            Repozytorium: & \url{https://github.com/lyskawson/f1-pitstop}
+        \end{tabular}
+
+        \vfill
+
+        % Data i miejsce
+        \large
+        Wrocław, 2026
+
+    \end{center}
+\end{titlepage}
+\hypersetup{pageanchor=true}
+
+\pagestyle{tableOfContentStyle}
+
+\tableofcontents
+
+\pagestyle{custom}
+
+\input{chapters/intro}
+\input{chapters/data}
+\input{chapters/architecture}
+\input{chapters/implementation}
+\input{chapters/verification}
+\input{chapters/discussion}
+\input{chapters/conclusions}
+
+\appendix
+\input{chapters/reproducibility}
+
+\clearpage
+\pagestyle{bibliographyStyle}
+\phantomsection
+\addcontentsline{toc}{chapter}{Bibliografia}
+\bibliographystyle{abbrvurl}
+\bibliography{bibliography}
+\end{document}

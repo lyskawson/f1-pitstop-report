@@ -1,0 +1,220 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-09",
+  "source_main_sha": "5ba376f904b58caf2072ce807cc822db7a90ccc6",
+  "t0_audit_sha": "49a38c9089cfa992287f832ef48b57f6089f72ef",
+  "t2_verifier_sha": "e4d484d62e52b85bb1642b2ed78d4b7af3c01290",
+  "snapshot_producer_sha": "e96ae051380b927f20017dfb98f411f0a3ffe38e",
+  "source_files": [
+    {
+      "path": "AGENTS.md",
+      "bytes": 1644,
+      "sha256": "6f29d45699773a6b265a32b790f147e445a381b69f9536779a4e6fe4415d6bf0",
+      "producing_or_verifying_revision": "5ba376f904b58caf2072ce807cc822db7a90ccc6"
+    },
+    {
+      "path": "docs/decisions.md",
+      "bytes": 16204,
+      "sha256": "37c1d9ffea4ecafd906365dd30319cf2333d348a8dcf473412a70aeca21694c4",
+      "producing_or_verifying_revision": "5ba376f904b58caf2072ce807cc822db7a90ccc6"
+    },
+    {
+      "path": "docs/contracts.md",
+      "bytes": 18928,
+      "sha256": "542f63092e0e4296f9989aa818692b11e34b688ced73a6c76c93aba0ade3e825",
+      "producing_or_verifying_revision": "5ba376f904b58caf2072ce807cc822db7a90ccc6"
+    },
+    {
+      "path": "docs/runbook.md",
+      "bytes": 9470,
+      "sha256": "ba68ef691365fde54ea32eb1914cea16718661c4cdc10db179023a9a153c6320",
+      "producing_or_verifying_revision": "5ba376f904b58caf2072ce807cc822db7a90ccc6"
+    },
+    {
+      "path": "docs/fastf1-findings.md",
+      "bytes": 13680,
+      "sha256": "f1e6ca907c7dac89c7debd685894ab8e51a520401f0c3e918952f9860de400a4",
+      "producing_or_verifying_revision": "5ba376f904b58caf2072ce807cc822db7a90ccc6"
+    },
+    {
+      "path": "pyproject.toml",
+      "bytes": 987,
+      "sha256": "cee22cba608cc568469a76bba35f1f63643a1b22baaf018f245f9c43a78a9e35",
+      "producing_or_verifying_revision": "5ba376f904b58caf2072ce807cc822db7a90ccc6"
+    },
+    {
+      "path": "uv.lock",
+      "bytes": 141572,
+      "sha256": "708ace7ccc1bbec73cb0a6ffc258426df6f7d81ff1ce8ba9c792ffc8a198b00c",
+      "producing_or_verifying_revision": "5ba376f904b58caf2072ce807cc822db7a90ccc6"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "bytes": 552,
+      "sha256": "6b784b6ede514c934015ed506deeea6450d1582447471dafe41f16f3c8abe616",
+      "producing_or_verifying_revision": "5ba376f904b58caf2072ce807cc822db7a90ccc6"
+    },
+    {
+      "path": "src/pitstop/contracts.py",
+      "bytes": 8695,
+      "sha256": "d529ba083b1f2eab9bdd27056f75886908ac4396ae6ced1871f83b179317271e",
+      "producing_or_verifying_revision": "5ba376f904b58caf2072ce807cc822db7a90ccc6"
+    },
+    {
+      "path": "src/pitstop/ingest.py",
+      "bytes": 26616,
+      "sha256": "066685e949e73783c5034223888a07c3398b158303c1d8159da7f746897e797c",
+      "producing_or_verifying_revision": "5ba376f904b58caf2072ce807cc822db7a90ccc6"
+    },
+    {
+      "path": "src/pitstop/cli.py",
+      "bytes": 2140,
+      "sha256": "f9a19c310e115875536166d263ed698b9e2009973e37d26ffc68717fae776452",
+      "producing_or_verifying_revision": "5ba376f904b58caf2072ce807cc822db7a90ccc6"
+    },
+    {
+      "path": "notebooks/t0_fastf1_spike.py",
+      "bytes": 19329,
+      "sha256": "6aa2a4e7b2c383797f686aa40fe568367098d3bfd20e310ecb175fb47f452ea0",
+      "producing_or_verifying_revision": "5ba376f904b58caf2072ce807cc822db7a90ccc6"
+    },
+    {
+      "path": "tests/test_ingest.py",
+      "bytes": 20350,
+      "sha256": "a1a818fac55ac7868c8ef87344f0f09eebe3dca503b701d63a50dc1a2b8396f0",
+      "producing_or_verifying_revision": "5ba376f904b58caf2072ce807cc822db7a90ccc6"
+    },
+    {
+      "path": "tests/test_contracts.py",
+      "bytes": 14696,
+      "sha256": "b11b38d518900e6dd23cd738202245be95a265eb93a2316e1ad3d7bcd8042930",
+      "producing_or_verifying_revision": "5ba376f904b58caf2072ce807cc822db7a90ccc6"
+    },
+    {
+      "path": "tests/test_fixtures.py",
+      "bytes": 8749,
+      "sha256": "155cb9add42858ace4a4f793f3ebcd6f18b538fb273d09c108a1584cb5cb082f",
+      "producing_or_verifying_revision": "5ba376f904b58caf2072ce807cc822db7a90ccc6"
+    },
+    {
+      "path": "tests/fixtures/raw/laps.parquet",
+      "bytes": 39934,
+      "sha256": "929fad5a2b08bd5812f0cda6ffcf8e242ff19d50b628f81cfcd855010da58e09",
+      "producing_or_verifying_revision": "5ba376f904b58caf2072ce807cc822db7a90ccc6"
+    },
+    {
+      "path": "tests/fixtures/raw/events.json",
+      "bytes": 571,
+      "sha256": "d4c0b1ad9afec05b0c93cdf5fdc80ed696dc708c99460e631521242322156281",
+      "producing_or_verifying_revision": "5ba376f904b58caf2072ce807cc822db7a90ccc6"
+    },
+    {
+      "path": "manifests/data.json",
+      "bytes": 1211068,
+      "sha256": "36ee960d81516ad4c3a4b514686d13da667f393868d567b39c99557ea376f0f5",
+      "producing_or_verifying_revision": "5ba376f904b58caf2072ce807cc822db7a90ccc6"
+    }
+  ],
+  "evidence_artifacts": [
+    {
+      "path": "reports/T0-fix1-evidence/summary-after.json",
+      "bytes": 3981937,
+      "sha256": "51e4db30e79e031e32573d1f2e59f2c61689abedd8f44f7e365ad9411e9e89d2",
+      "producing_or_verifying_revision": "49a38c9089cfa992287f832ef48b57f6089f72ef"
+    },
+    {
+      "path": "reports/T0-fix1-evidence/analyze-result.json",
+      "bytes": 326,
+      "sha256": "6a89abe3ae7b6905491ea5d564b167c519d653fdac4dea69478e3d7aa2846ad4",
+      "producing_or_verifying_revision": "49a38c9089cfa992287f832ef48b57f6089f72ef"
+    },
+    {
+      "path": "reports/T2-evidence/coverage-summary.json",
+      "bytes": 18824,
+      "sha256": "cbbbd0d3385c0d2e4e72f435665ecb84c583ad96c11e5de58477d5ef114fa351",
+      "producing_or_verifying_revision": "e96ae051380b927f20017dfb98f411f0a3ffe38e"
+    },
+    {
+      "path": "reports/T2-fix1-evidence/final-acceptance.log",
+      "bytes": 1366,
+      "sha256": "7f74fed4237150d9194657d4ee7a2fd1ab944b4e1ae3eadbb12ab639313aa2f8",
+      "producing_or_verifying_revision": "e4d484d62e52b85bb1642b2ed78d4b7af3c01290"
+    },
+    {
+      "path": "reports/T2-fix1-evidence/final-acceptance-result.json",
+      "bytes": 409,
+      "sha256": "9113e560e79aaf2bac2ffc5f3f3513d21a2bc579dc310b7769c2ed8fcce408e9",
+      "producing_or_verifying_revision": "e4d484d62e52b85bb1642b2ed78d4b7af3c01290"
+    },
+    {
+      "path": "reports/T2-fix1-evidence/final-local-data-result.json",
+      "bytes": 402,
+      "sha256": "7bf239c94545a1a4828cb2bce6c8664f9a09179cbc982ad6638afeac7f1660a2",
+      "producing_or_verifying_revision": "e4d484d62e52b85bb1642b2ed78d4b7af3c01290"
+    },
+    {
+      "path": "reports/T2-fix1-evidence/local-data-summary.json",
+      "bytes": 2119,
+      "sha256": "623dee10450b3a080bdd88293225bc490fb704216ca8a84f352bbe38d15f0d5b",
+      "producing_or_verifying_revision": "e4d484d62e52b85bb1642b2ed78d4b7af3c01290"
+    },
+    {
+      "path": "reports/T2-fix1-evidence/final-integrity.json",
+      "bytes": 441,
+      "sha256": "70073c3b3d3c66fbc481790cb9801a89ed7496c4976c80f8a0916e9feb971fbe",
+      "producing_or_verifying_revision": "e4d484d62e52b85bb1642b2ed78d4b7af3c01290"
+    },
+    {
+      "path": "reports/T2-merge-evidence.json",
+      "bytes": 2446,
+      "sha256": "40764a23c307f6addb96a675248a438fcc031285e2d93bef7d5d0796961b3c05",
+      "producing_or_verifying_revision": "5ba376f904b58caf2072ce807cc822db7a90ccc6"
+    },
+    {
+      "path": "reports/T0-merge-evidence.json",
+      "bytes": 5917,
+      "sha256": "36a0887029ecc52820dd92bff30329a2d122fc8c0513b1e9fe29651f3dfbc488",
+      "producing_or_verifying_revision": "997f07b712427b6ca801f9d9540612a5b7c94f22"
+    }
+  ],
+  "evidence_access_note": "Evidence paths are relative to the private project evidence archive, not this public repository. No original private logs or datasets are included.",
+  "template": {
+    "name": "Sieci_neuronowe_projekt",
+    "inspected_on": "2026-11-09",
+    "newer_zip_supplied": false,
+    "files": [
+      {
+        "path": "main.tex",
+        "bytes": 1451,
+        "sha256": "dd16aae196451070a2f95937d7b026b276cfccd1c7d24f15430d178ef47878f8"
+      },
+      {
+        "path": "latex-settings.tex",
+        "bytes": 18108,
+        "sha256": "fc872caf4c2d09441fa5dfa8bd36fbb84f23326e1573ba4eba6255de276189d3"
+      },
+      {
+        "path": "bibliography.bib",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "chapters/intro.tex",
+        "bytes": 24,
+        "sha256": "3b15134bc3af129c4e669bed440bb3b83e67b9af8944a192f4e8badb3ecd30d0"
+      },
+      {
+        "path": "logoPWr_PL_pion_kolor_v1.png",
+        "bytes": 30916,
+        "sha256": "26e5b59a3db85bd386b50db679ec555ef4e4d454e6568a397af1364b0acac9c5"
+      }
+    ]
+  },
+  "candidate_archive": {
+    "source_relative_path": "data/raw/v1.tar.gz",
+    "bytes": 1438537,
+    "sha256": "f30bff5fdaa6c280203483e878ca1e4c9189761e7471b6e8a83d74d93e09c410",
+    "status": "local candidate; human data acceptance and release publication pending"
+  },
+  "candidate_manifest_sha256": "36ee960d81516ad4c3a4b514686d13da667f393868d567b39c99557ea376f0f5"
+}

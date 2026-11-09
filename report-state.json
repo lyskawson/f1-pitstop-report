@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "updated_on": "2026-11-09",
+  "source_main_sha": "5ba376f904b58caf2072ce807cc822db7a90ccc6",
+  "source_read_method": "Frozen git archive; no application repository mutations",
+  "report_repository": "https://github.com/lyskawson/f1-pitstop-report",
+  "template": {
+    "name": "Sieci_neuronowe_projekt",
+    "inspected_on": "2026-11-09",
+    "title_page_preserved": true,
+    "hashes": "evidence/provenance.json",
+    "newer_zip_supplied": false
+  },
+  "evidence_artifacts": "evidence/provenance.json",
+  "evidence_aggregates": "evidence/summary.json",
+  "covered_stages": [
+    "T1 repository skeleton, schemas, configuration, CI",
+    "T1b actual FastF1 dependency pin",
+    "T0 human acquisition workflow, offline audit, corrections, fixtures",
+    "T2 accepted offline ingest and corrected portable verifier"
+  ],
+  "unresolved_questions": [
+    "D2: approved tyre-change label rule after penalty-only Stint increases",
+    "D5: timestamped lap-count consumer schema and pre-first-announcement policy",
+    "T2c: implement approved legacy acquisition timestamp allowance in a dedicated contract PR",
+    "Separate human snapshot acceptance and data archive publication",
+    "Clarify exact-versus-mixed SC IsAccurate wording in decisions with human approval",
+    "Missing tyre histories, unmatched visits and pit-entry timing offsets",
+    "Remaining pipeline, leakage tests, models, predictive evaluation and dashboard"
+  ],
+  "model_training_performed": false,
+  "validation_metrics_reported": false,
+  "locked_test_evaluated": false,
+  "compilation": {
+    "status": "passed",
+    "command": "latexmk -pdf -interaction=nonstopmode -halt-on-error -outdir=build main.tex",
+    "compiler": "pdfTeX 1.40.29 (TeX Live 2026/Homebrew)",
+    "latexmk": "4.87",
+    "bibliography": "BibTeX / abbrvurl",
+    "pages": 15,
+    "undefined_references": 0,
+    "undefined_citations": 0,
+    "overfull_boxes": 0,
+    "latex_warnings": 0,
+    "output": "build/main.pdf",
+    "pdf_sha256": "61a6dcc393a4124ec8e532ea9b6255c1db308c9d631cf40c698cbde1322dee77"
+  },
+  "visual_check": {
+    "status": "passed",
+    "renderer": "pdftoppm (Poppler), 1500 px page height",
+    "rendered_pages": 15,
+    "checked_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "checks": [
+      "Polish glyphs, title page and supplied metadata",
+      "tables, captions, margins and wrapping",
+      "headers, footers, page breaks and bibliography",
+      "Final pages 10 and 11 re-inspected after widow/orphan fix; remaining 13 pages pixel-identical to inspected render"
+    ],
+    "remaining_layout_defects": 0
+  },
+  "portability_check": {
+    "status": "passed",
+    "method": "Copy source files only into a clean directory, compile with pdfLaTeX/BibTeX and -no-shell-escape",
+    "pages": 15,
+    "application_checkout_required": false,
+    "external_assets_required": false,
+    "overleaf_service_build": "not performed; no authenticated connection supplied"
+  },
+  "publication": {
+    "status": "checked sources ready for initial public publication",
+    "visibility": "public authorized",
+    "overleaf_connection": "not configured"
+  },
+  "next_user_step": "Import the report GitHub repository as a new Overleaf project if premium access is available, or upload the portable source ZIP; select main.tex and pdfLaTeX."
+}

@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "kind": "Selected aggregates extracted from existing evidence, not new experiments",
+  "t0": {
+    "source": "reports/T0-fix1-evidence/summary-after.json",
+    "producing_revision": "49a38c9089cfa992287f832ef48b57f6089f72ef",
+    "coverage": {
+      "loaded": 92,
+      "failed": 0,
+      "excluded": 18
+    },
+    "missing_compound": 780,
+    "jolpica_comparison": {
+      "fastf1_changes": 3339,
+      "jolpica_stops": 3363,
+      "matched": 3339
+    },
+    "unmatched_jolpica": 24,
+    "pit_in_outside_lap": 97,
+    "accuracy": {
+      "in_laps": {
+        "observations": 3469,
+        "accurate": 0
+      },
+      "out_laps": {
+        "observations": 3467,
+        "accurate": 0
+      },
+      "after_exact_sc": {
+        "observations": 2806,
+        "accurate": 0
+      },
+      "after_any_sc": {
+        "observations": 5260,
+        "accurate": 1017
+      }
+    },
+    "retained_lap_count_examples": [
+      {
+        "race_id": "2023_14_R",
+        "counts": [
+          53,
+          52,
+          51
+        ],
+        "last_announcement_seconds": 4411.732,
+        "earliest_recorded_lap_end_seconds": 5028.992
+      },
+      {
+        "race_id": "2025_11_R",
+        "counts": [
+          71,
+          70
+        ],
+        "last_announcement_seconds": 3485.191,
+        "earliest_recorded_lap_end_seconds": 4357.412
+      }
+    ],
+    "japan_2022": {
+      "loader": 53,
+      "maximum_recorded_lap": 29,
+      "maximum_non_generated_lap": 28
+    },
+    "fixture_rows": {
+      "2022_01_R": 1125,
+      "2022_02_R": 820
+    },
+    "miami_driver_4": {
+      "rows": 57,
+      "missing_compound": 24
+    }
+  },
+  "t2": {
+    "source": "reports/T2-evidence/coverage-summary.json",
+    "producing_revision": "e96ae051380b927f20017dfb98f411f0a3ffe38e",
+    "rows": 101290,
+    "requested_by_season": {
+      "2022": 22,
+      "2023": 22,
+      "2024": 24,
+      "2025": 24
+    },
+    "generated_rows": 135,
+    "pit_in_markers": 3469,
+    "pit_out_markers": 3467,
+    "distinct_whole_race_exclusions": 18
+  },
+  "tests": {
+    "source": "reports/T2-fix1-evidence/final-acceptance.log",
+    "verifying_revision": "e4d484d62e52b85bb1642b2ed78d4b7af3c01290",
+    "passed": 209,
+    "ruff_check": "passed",
+    "ruff_format": "passed",
+    "rerun_for_report": false
+  }
+}

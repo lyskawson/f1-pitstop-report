@@ -83,9 +83,13 @@
     "overleaf_service_build": "not performed; no authenticated connection supplied"
   },
   "publication": {
-    "status": "checked sources ready for initial public publication",
-    "visibility": "public authorized",
-    "overleaf_connection": "not configured"
+    "status": "published",
+    "visibility": "PUBLIC",
+    "url": "https://github.com/lyskawson/f1-pitstop-report",
+    "branch": "main",
+    "initial_source_commit": "854c533c761e5d26c35ffca4c958e3bca3c413e9",
+    "verified_on": "2026-11-09",
+    "overleaf_connection": "not configured; actual account/project Git URL not supplied"
   },
   "next_user_step": "Import the report GitHub repository as a new Overleaf project if premium access is available, or upload the portable source ZIP; select main.tex and pdfLaTeX."
 }

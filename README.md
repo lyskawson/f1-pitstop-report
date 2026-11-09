@@ -102,6 +102,11 @@ revisions, update records and editorial notes in this README, the evidence map
 and report-state.json. Preserve scientific limitations and identify experimental
 inputs where needed for interpretation.
 
+Use neutral academic descriptions such as “data were collected in a local
+cache”. Avoid naming an operator or describing personal accounts and
+authentication in the PDF unless essential to the scientific explanation.
+Prefer short, complete sentences separated by periods to semicolons.
+
 The first 15-page version is retained in Git history at `66efab4`, with a local
 PDF/source backup in ignored `build/archive/pre-edit1/`. The current editorial
 target is 9–11 pages without changing fonts or margins. For the final report,

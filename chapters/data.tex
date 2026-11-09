@@ -3,15 +3,14 @@
 
 \section{Źródło, reprezentacja i jakość}
 
-Źródłem danych jest FastF1, w audycie użyte w wersji \code{3.9.0a0}.
-Człowiek pobrał dane do lokalnej pamięci podręcznej z użyciem własnego
-uwierzytelnienia F1 TV; dalszy eksport i analiza działają offline.
-Zespół może więc korzystać z tej samej utrwalonej wersji bez ponownego
-pobierania i bez przekazywania poświadczeń. Obok okrążeń zachowano
+Dane pozyskano za pomocą biblioteki FastF1 w wersji \code{3.9.0a0}.
+Dane zebrano w lokalnej pamięci podręcznej. Eksport i analizę
+przeprowadzono offline. Pozwala to korzystać z tej samej utrwalonej
+wersji bez ponownego pobierania. Obok okrążeń zachowano
 statusy toru, komunikaty kontroli wyścigu i zapowiedzi liczby okrążeń.
 Zestawienia wizyt Jolpica posłużyły do kontroli zgodności zdarzeń.
 Pogoda była sprawdzana w audycie, ale nie jest cechą ani składnikiem
-bieżącego eksportu; telemetria o wysokiej częstotliwości pozostaje
+bieżącego eksportu. Telemetria o wysokiej częstotliwości pozostaje
 poza zakresem.
 
 Kandydat danych zawiera 92 żądane i 92 załadowane wyścigi oraz
@@ -25,7 +24,7 @@ wyścigu, nie jako stały identyfikator osoby między sezonami.
 
 Czasy okrążeń i znaczników pit stopu zapisuje się w sekundach sesji.
 Brak znacznika wjazdu nie oznacza czasu równego zero. Nieznane pomiary
-pozostają puste; tekstowe napisy \code{nan} i \code{None} w polach
+pozostają puste. Tekstowe napisy \code{nan} i \code{None} w polach
 mieszanki i statusu są normalizowane do rzeczywistych braków.
 Poprawka ta ujawniła 780 braków mieszanki wcześniej błędnie liczonych
 jako obecne wartości. Nie odtwarza ona jednak historii opon.

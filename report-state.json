@@ -43,7 +43,7 @@
     "overfull_boxes": 0,
     "latex_warnings": 0,
     "output": "build/main.pdf",
-    "pdf_sha256": "f2cf01fad8ee56728abe8425362d5929eb4c3b7483cc8caa094b309376067a39"
+    "pdf_sha256": "b0c6a87fb4c3fc9e6cd32cf0ac2f07a65197c56eadef75c1f94f69fa5bae6cf8"
   },
   "visual_check": {
     "status": "passed",
@@ -62,9 +62,9 @@
       10
     ],
     "checks": [
-      "All 10 pages reviewed: revised pages 2, 3, 8, 9 and 10 visually inspected; five remaining pages pixel-identical to the previously inspected version",
-      "Polish glyphs, cover, tables, diagram, captions, margins, wrapping and page breaks checked",
-      "No source-revision/date framing remains in the PDF; exact provenance retained in maintenance files"
+      "Changed pages 4–9 rendered and visually inspected; other four pages pixel-identical to the previously inspected version",
+      "Polish glyphs, tables, diagram, captions, margins, wrapping and page breaks checked",
+      "Neutral impersonal collection description, no personal authentication details or semicolons in the academic prose"
     ],
     "remaining_layout_defects": 0
   },
@@ -116,10 +116,15 @@
       "note": "Editorial estimate, not a project/model result; differs from review counting method"
     }
   },
-  "narrative_policy": "Continuous academic project account that grows with completed work; no code SHA/date snapshot preface, revision-oriented status captions or editorial process prose in the PDF. Exact provenance stays in maintenance files.",
+  "narrative_policy": "Continuous academic project account that grows with completed work; no code SHA/date snapshot preface, revision-oriented status captions or editorial process prose in the PDF. Exact provenance stays in maintenance files. Use neutral impersonal academic descriptions, omit personal account/authentication details, and prefer short full sentences to semicolons.",
   "narrative_revision": {
     "previous_report_commit": "7e893ce90b7ceb69d423ad52a31f5a2fb4bc5d5f",
     "change": "Remove source revision/date framing and related editorial process wording from the PDF; retain exact provenance outside it",
     "prior_archive": "build/archive/pre-edit2/ (ignored)"
+  },
+  "style_revision": {
+    "previous_report_commit": "d86abf61485be7244860cf0acb65f1de1140c5f4",
+    "change": "Neutral data-collection wording throughout the PDF and full sentences instead of semicolons",
+    "prior_archive": "build/archive/pre-edit3/ (ignored)"
   }
 }

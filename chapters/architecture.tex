@@ -12,7 +12,7 @@ przepływu i zaczynają etapy projektowane~\cite{project}.
 \begin{figure}[htbp]
 \centering\small
 \begin{tabular}{c}
-\fbox{\strut Człowiek: pobranie do cache FastF1} \\[5pt]
+\fbox{\strut Dane FastF1 w lokalnej pamięci podręcznej} \\[5pt]
 $\downarrow$ \\[3pt]
 \fbox{\strut Offline: normalizacja $\to$ snapshot i manifest $\to$ weryfikacja} \\[5pt]
 $\downarrow$ \\[3pt]
@@ -32,19 +32,19 @@ ich pochodzenie, rozmiary, skróty SHA-256, pokrycie i powody wykluczeń.
 Podział ten pozwala oddzielić jednorazowe pozyskanie danych od ich
 wielokrotnego wykorzystania w eksperymentach.
 
-Eksport blokuje połączenia sieciowe i uwierzytelnienie. Brak odpowiedzi
+Eksport działa wyłącznie offline. Brak odpowiedzi
 w cache jest błędem, nawet jeśli biblioteka wewnętrznie stłumi problem
 odczytu. Niekompletnego wejścia nie można w ten sposób pomylić
 z poprawnym zbiorem. Surowe wiersze, także wygenerowane, niedokładne
-i niejednoznaczne, pozostają zachowane; wykluczenia są metadanymi.
+i niejednoznaczne, pozostają zachowane. Wykluczenia są metadanymi.
 Pozwala to odtworzyć konsekwencje późniejszej reguły etykiet lub
 czyszczenia bez ponownego pobierania źródła.
 
 Snapshot powstaje najpierw w obszarze roboczym. Po sprawdzeniu plików
 program pakuje archiwum, rozpakowuje je i weryfikuje ponownie przed
 nadaniem docelowej nazwy. Istniejącej wersji nie zastępuje.
-Odbiorca może uruchomić sam weryfikator bez cache, poświadczeń
-i importowania FastF1. Sprawdza on zarówno integralność bajtów, jak
+Weryfikator działa niezależnie od pamięci podręcznej i biblioteki
+FastF1. Sprawdza zarówno integralność bajtów, jak
 i zgodność treści: typy, klucze, tożsamość wyścigów, znaczniki czasu
 oraz pokrycie i wykluczenia obliczone ponownie z tabel.
 To istotne, ponieważ zgodny skrót potwierdza tożsamość pliku, a nie
@@ -69,14 +69,14 @@ wierszy, która inaczej mogłaby przypisać cechy do niewłaściwej odpowiedzi.
 Dla $N$ próbek zaplanowano macierz tablicową
 $X_{\mathrm{tab}}\in\mathbb{R}^{N\times15}$ oraz tensor sekwencyjny
 $X_{\mathrm{seq}}\in\mathbb{R}^{N\times15\times16}$.
-Pierwsza zawiera 15 cech bieżącego okrążenia; drugi obejmuje 15
+Pierwsza zawiera 15 cech bieżącego okrążenia. Drugi obejmuje 15
 kolejnych kroków historii i dodatkowy kanał \code{is_pad}, oznaczający
 dołożone z lewej strony zera dla krótkiej historii. Cechy mają opisywać
 opony, przebieg stintu, tempo, pozycję i kontekst stawki.
 Walidatory już sprawdzają kształty, skończoność wartości i poprawność
 dopełnienia. Z samej tablicy nie ustalą jednak, czy wszystkie kroki
-pochodzą od jednego kierowcy i kończą się na $t$; ta własność należy
-do przyszłej kontroli budowy okien.
+pochodzą od jednego kierowcy i kończą się na $t$. Ta własność wymaga
+przyszłej kontroli budowy okien.
 
 \section{Technologie i dalsze metody}
 

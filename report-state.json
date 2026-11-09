@@ -43,7 +43,7 @@
     "overfull_boxes": 0,
     "latex_warnings": 0,
     "output": "build/main.pdf",
-    "pdf_sha256": "20f6bad00125e75305834780ba40962143f9638fe31c77fd246d74fbc66f82ab"
+    "pdf_sha256": "f2cf01fad8ee56728abe8425362d5929eb4c3b7483cc8caa094b309376067a39"
   },
   "visual_check": {
     "status": "passed",
@@ -62,9 +62,9 @@
       10
     ],
     "checks": [
-      "All revised pages inspected; Polish glyphs, tables, diagram, captions, margins, page breaks and references checked",
-      "Final changed pages 3, 7 and 8 re-inspected; seven remaining pages pixel-identical to inspected render",
-      "Compared with prior 15-page PDF: identical cover and typography, consolidated body and one status summary"
+      "All 10 pages reviewed: revised pages 2, 3, 8, 9 and 10 visually inspected; five remaining pages pixel-identical to the previously inspected version",
+      "Polish glyphs, cover, tables, diagram, captions, margins, wrapping and page breaks checked",
+      "No source-revision/date framing remains in the PDF; exact provenance retained in maintenance files"
     ],
     "remaining_layout_defects": 0
   },
@@ -115,5 +115,11 @@
       "reduction_percent": 42.2,
       "note": "Editorial estimate, not a project/model result; differs from review counting method"
     }
+  },
+  "narrative_policy": "Continuous academic project account that grows with completed work; no code SHA/date snapshot preface, revision-oriented status captions or editorial process prose in the PDF. Exact provenance stays in maintenance files.",
+  "narrative_revision": {
+    "previous_report_commit": "7e893ce90b7ceb69d423ad52a31f5a2fb4bc5d5f",
+    "change": "Remove source revision/date framing and related editorial process wording from the PDF; retain exact provenance outside it",
+    "prior_archive": "build/archive/pre-edit2/ (ignored)"
   }
 }

@@ -95,6 +95,13 @@ the compact completion summary is in chapter 5. Existing software checks and
 a short future experiment plan share chapter 4. Replace plans with realized
 methods/results as work lands rather than keeping both accounts.
 
+Write the PDF as a continuous account of the project that grows with completed
+work. Do not introduce it with a code SHA, update date or snapshot description,
+and do not frame status captions around a source revision. Keep exact code
+revisions, update records and editorial notes in this README, the evidence map
+and report-state.json. Preserve scientific limitations and identify experimental
+inputs where needed for interpretation.
+
 The first 15-page version is retained in Git history at `66efab4`, with a local
 PDF/source backup in ignored `build/archive/pre-edit1/`. The current editorial
 target is 9–11 pages without changing fonts or margins. For the final report,

@@ -9,8 +9,12 @@ Full file sizes/SHA-256 identities are in `evidence/provenance.json`. Paths
 starting `reports/` below refer to the separate project evidence archive;
 the private originals are not copied here. `evidence/summary.json` contains
 selected aggregates only. Hashes identify evidence but do not make inaccessible
-evidence publicly reproducible. Public code links in the bibliography remain
-pinned to the frozen source SHA.
+evidence publicly reproducible. The PDF bibliography uses project links;
+the precise consulted versions are the
+[frozen source](https://github.com/lyskawson/f1-pitstop/tree/5ba376f904b58caf2072ce807cc822db7a90ccc6)
+and [frozen findings](https://github.com/lyskawson/f1-pitstop/blob/5ba376f904b58caf2072ce807cc822db7a90ccc6/docs/fastf1-findings.md).
+Source-revision/date framing and editorial update records stay outside the
+academic PDF narrative, which is developed as a continuous project account.
 
 ## Revisions
 
@@ -115,6 +119,6 @@ links retained here instead of separate bibliography entries.
 | Possible applications | §5.2 | Historical analysis; no optimal-strategy/causal adviser. |
 | Degree of goal completion | Table 5.1 and conclusions | Partially achieved; one completion summary. |
 
-Reproducibility is supported by the pinned bibliography, README, runbook,
+Reproducibility is supported by the pinned sources above, README, runbook,
 evidence map and original artifact hashes. Private evidence still requires
 separate access. Overleaf service compilation/sync is not claimed.

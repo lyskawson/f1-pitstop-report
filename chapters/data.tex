@@ -1,153 +1,122 @@
-\Chapter{Dane i warunki predykcji}
+\Chapter{Dane i przygotowanie zbioru}
 \label{ch:data}
 
-\section{Źródło, zakres i pozyskiwanie}
+\section{Źródło, reprezentacja i jakość}
 
-Źródłem informacji jest FastF1 w wersji \code{3.9.0a0}, użytej w audycie
-i zapisanej w blokadzie zależności projektu. Zakres obejmuje sesje Race
-sezonów 2022--2025, bez sprintów. Człowiek pobrał dane do lokalnej pamięci
-podręcznej; dostęp do archiwum wymagał jego uwierzytelnienia F1 TV.
-Token nie jest częścią zbioru ani repozytorium. Analiza i pakowanie danych
-odbywają się następnie offline. Rozdzielenie pobrania i obliczeń pozwala
-pozostałym członkom zespołu pracować na tych samych plikach bez konta
-użytego do ich pozyskania~\cite{runbook}.
+Źródłem danych jest FastF1, w audycie użyte w wersji \code{3.9.0a0}.
+Człowiek pobrał dane do lokalnej pamięci podręcznej z użyciem własnego
+uwierzytelnienia F1 TV; dalszy eksport i analiza działają offline.
+Zespół może więc korzystać z tej samej utrwalonej wersji bez ponownego
+pobierania i bez przekazywania poświadczeń. Obok okrążeń zachowano
+statusy toru, komunikaty kontroli wyścigu i zapowiedzi liczby okrążeń.
+Zestawienia wizyt Jolpica posłużyły do kontroli zgodności zdarzeń.
+Pogoda była sprawdzana w audycie, ale nie jest cechą ani składnikiem
+bieżącego eksportu; telemetria o wysokiej częstotliwości pozostaje
+poza zakresem.
 
-W audycie T0 wykorzystano dane okrążeń, komunikaty kontroli wyścigu,
-strumień liczby okrążeń i zestawienia wizyt w alei serwisowej Jolpica.
-Pogodę zapisano w pamięci podręcznej i sprawdzono jej dostępność, ale
-nie jest cechą modelu ani składnikiem eksportu T2. Telemetria o wysokiej
-częstotliwości nie należy do zakresu v1. Powoduje to utratę szczegółowego
-obrazu jazdy, ale utrzymuje rozmiar problemu i kodu na poziomie odpowiednim
-dla projektu studenckiego.
+Kandydat danych zawiera 92 żądane i 92 załadowane wyścigi oraz
+101\,290 surowych wierszy. Są to liczby pokrycia wejścia, nie rozmiar
+gotowego zbioru uczącego. Każdy wiersz opisuje okrążenie jednego
+kierowcy: jego czas zakończenia i trwania, pozycję, status toru,
+znaczniki wjazdu i wyjazdu oraz historię opon. \code{Compound} oznacza
+mieszankę, \code{TyreLife} wiek opony, a \code{Stint} nominalny numer
+odcinka historii opon. Numer kierowcy interpretuje się w kontekście
+wyścigu, nie jako stały identyfikator osoby między sezonami.
 
-Utrwalony kandydat danych zawiera 92 żądane i 92 załadowane wyścigi oraz
-101\,290 surowych wierszy. Dowód eksportu podaje po 22 wyścigi z sezonów
-2022 i 2023 oraz po 24 z 2024 i 2025. Są to liczby opisujące wejście,
-nie rozmiar gotowego zbioru uczącego. Etykiet i macierzy cech jeszcze nie
-wytworzono. Liczby te pochodzą z zachowanych dowodów T2, których pochodzenie
-opisano w dodatku~\ref{ch:repro} oraz w \code{evidence-map.md}.
+Czasy okrążeń i znaczników pit stopu zapisuje się w sekundach sesji.
+Brak znacznika wjazdu nie oznacza czasu równego zero. Nieznane pomiary
+pozostają puste; tekstowe napisy \code{nan} i \code{None} w polach
+mieszanki i statusu są normalizowane do rzeczywistych braków.
+Poprawka ta ujawniła 780 braków mieszanki wcześniej błędnie liczonych
+jako obecne wartości. Nie odtwarza ona jednak historii opon.
+Sam sukces odczytu sesji nie gwarantuje, że każdą jej obserwację da się
+wykorzystać w uczeniu~\cite{findings}.
 
-\section{Reprezentacja i brakujące obserwacje}
+Przyjęta polityka wyklucza cały wyścig, jeśli występuje choć jedno
+okrążenie na oponach INTERMEDIATE/WET lub status zawierający kod
+czerwonej flagi. Audyt wskazał 18 takich wyścigów. Pozostają okrążenia
+z samochodem bezpieczeństwa (SC) i wirtualnym samochodem bezpieczeństwa
+(VSC). Dla pary wyścig--kierowca powodem wykluczenia jest przerwa większa
+niż trzy brakujące okrążenia lub ponad 10\% braków mieszanki bądź wieku
+opony. Szczególne reguły opon w Katarze 2023, Monako 2025 i Katarze 2025
+są osobno oznaczane. Eksporter zapisuje powody wykluczeń jako metadane,
+nie usuwa materiału surowego. Docelowe zastosowanie reguł przy budowie
+próbek musi zachować tę możliwość kontroli.
 
-Surowy klucz to \code{(race_id, DriverNumber, LapNumber)}.
-Identyfikator wyścigu ma format \code{YYYY_RR_R}, np. \code{2022_01_R};
-numer kierowcy jest tekstem, a numer okrążenia dodatnią liczbą
-\code{int64}. Nie należy utożsamiać numeru kierowcy z niezmiennym
-identyfikatorem osoby pomiędzy sezonami.
+\section{Znaczenie etykiety}
 
-\begin{table}[htbp]
-\centering\small
-\caption{Najważniejsze grupy pól surowych danych.}
-\label{tab:raw}
-\begin{tabularx}{\textwidth}{L{0.39\textwidth}Y}
-\toprule
-Pola & Znaczenie i reprezentacja \\
-\midrule
-\code{Time}, \code{LapTime} & Koniec okrążenia i jego czas; \code{float64}, sekundy. \\
-\code{PitInTime}, \code{PitOutTime} & Znaczniki wjazdu i wyjazdu, sekundy sesji; brak nie jest zerem. \\
-\code{Stint}, \code{Compound}, \code{TyreLife} & Numer stintu, mieszanka i wiek opony; braki pozostają brakami. \\
-\code{Position}, \code{TrackStatus} & Pozycja i tekstowy status, także wielokodowy. \\
-\code{IsAccurate}, \code{FastF1Generated} & Znaczniki logiczne dokładności i wiersza wygenerowanego przez bibliotekę. \\
-\bottomrule
-\end{tabularx}
-\end{table}
-
-Adapter przelicza czasy z reprezentacji czasowej biblioteki na sekundy
-zmiennoprzecinkowe. Zachowuje wiersze, znaczniki pit stopów i nieznane
-pomiary. W polach \code{Compound} i \code{TrackStatus} napisy
-\code{nan} i \code{None} zamienia na rzeczywiste wartości puste.
-To korekta reprezentacji braku, a nie imputacja, czyli odtwarzanie
-nieznanego pomiaru. W T0 poprawka ujawniła łącznie 780 braków
-\code{Compound}, wcześniej błędnie liczonych jako wartości obecne.
-W Miami 2025 kierowca o numerze 4 ma 24 takie braki na 57 zapisanych
-okrążeń. Sukces odczytu sesji nie gwarantuje więc użytecznej historii
-opon~\cite{findings}.
-
-Zgodnie z D3 wyścig podlega wykluczeniu, jeśli choć jedno okrążenie
-zawiera mieszankę INTERMEDIATE/WET lub kod czerwonej flagi \code{5}.
-W audycie wskazano 18 różnych wyścigów spełniających co najmniej jeden
-z tych warunków. SC (samochód bezpieczeństwa) i VSC (wirtualny samochód
-bezpieczeństwa) pozostają w zakresie. Osobne reguły dotyczą pary
-wyścig--kierowca: przerwa większa niż trzy brakujące okrążenia lub ponad
-10\% braków w jednym z pól \code{Compound}/\code{TyreLife}.
-T2 zapisuje powody wykluczeń w manifeście, zachowując wszystkie surowe
-wiersze. Nie wypełnia braków ani nie tworzy etykiet. Flaga szczególnych
-reguł opon obejmuje Katar 2023, Monako 2025 i Katar 2025; sama nie
-wyklucza wyścigu~\cite{decisions,project}.
-
-\section{Audyt etykiety: wizyta nie dowodzi wymiany opon}
-
-Pierwotna D2 zakładała dodatnią odpowiedź dla próbki $t$, gdy
-\code{PitInTime} występuje na $t+1$, istnieje $t+2$ i numer stintu na
-$t+2$ jest większy niż na $t+1$. Audyt wykazał wzrost \code{Stint}
-również przy przejazdach związanych z karą. Przykład z Baku 2022
-przedstawiono w tabeli~\ref{tab:penalty}. Kontekst komunikatów kontroli
-wyścigu wskazuje karę stop/go, natomiast wiek opony rośnie bez przerwania
-historii. Sam wzrost stintu nie wystarcza więc jako dowód wymiany.
+Pierwotna reguła przyjmowała odpowiedź dodatnią, gdy na okrążeniu $t+1$
+zapisano \code{PitInTime}, istniało $t+2$, a numer stintu między tymi
+okrążeniami wzrósł. Audyt wykazał taki wzrost także przy obsłudze kar.
+W przykładzie z tabeli~\ref{tab:penalty} komunikaty kontroli wyścigu
+wskazują karę stop/go, a wiek opony rośnie bez przerwania historii.
+Oznacza to, że wzrost \code{Stint} nie stanowi samodzielnego dowodu
+wymiany opon~\cite{findings}.
 
 \begin{table}[htbp]
 \centering\small
-\caption{Surowa obserwacja z \code{2022_08_R}, kierowca 6; źródło: audyt T0.}
+\caption{Przejazd związany z karą: Baku 2022, kierowca 6.}
 \label{tab:penalty}
-\begin{tabular}{rrrrll}
+\begin{tabular}{rrrll}
 \toprule
-Okrążenie & Stint & TyreLife & PitInTime [s] & PitOutTime [s] & Compound \\
+Okrążenie & Stint & TyreLife & Znacznik alei & Compound \\
 \midrule
-3 & 1 & 3 & 4131.373 & brak & MEDIUM \\
-4 & 2 & 4 & brak & 4160.747 & MEDIUM \\
+3 & 1 & 3 & wjazd & MEDIUM \\
+4 & 2 & 4 & wyjazd & MEDIUM \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Niezmieniona mieszanka sama także nie dowodzi braku wymiany: można
-założyć inny komplet tej samej mieszanki. Podobnie wiek opony wymaga
-ostrożnej interpretacji przy używanych kompletach i brakach danych.
-Nie zatwierdzono nowego klasyfikatora ani reguły opartej wyłącznie na
-\code{Compound} lub \code{TyreLife}. Zastąpienie celu samą wizytą w alei
-zmieniłoby zadanie. D2 pozostaje otwarta przed implementacją etykiet.
+Niezmieniona mieszanka także nie dowodzi braku wymiany: można założyć
+inny komplet tej samej mieszanki. Wiek opony wymaga uwzględnienia
+używanych kompletów i braków danych. Nie zatwierdzono zastępczego
+klasyfikatora opartego wyłącznie na tych polach. Reguła etykiet pozostaje
+zatem otwarta przed ich implementacją. Zmiana odpowiedzi na samą wizytę
+w alei oznaczałaby zmianę celu projektu.
 
-Audyt porównał pomocniczy wskaźnik wjazdu i wzrostu stintu z wizytami
-Jolpica, dopuszczając różnicę jednego okrążenia. Uzyskano 3339 dopasowań
-do 3363 wizyt Jolpica i 24 wizyty bez odpowiednika po stronie wskaźnika.
-To kontrola zgodności rejestrów wizyt, nie miara trafności predykcji ani
-potwierdzenie wymiany opon. Nie wolno automatycznie zamienić niedopasowań
-na etykiety ujemne~\cite{findings}.
+Porównanie pomocniczego wskaźnika wjazdu i wzrostu stintu z Jolpica,
+z tolerancją jednego okrążenia, dało 3339 dopasowań do 3363 wizyt.
+Zgodność ta dotyczy rejestrów przejazdów, nie potwierdzonych wymian opon:
+kary mogą występować w obu źródłach. Pozostałych wizyt nie wolno
+bez wyjaśnienia zamienić na etykiety ujemne. Podobnie oznaczenia
+\code{PitInTime} i \code{PitOutTime} zachowują przypisanie do
+źródłowych okrążeń, nawet gdy występuje niewielka rozbieżność ich czasów
+względem granic okrążenia.
 
-\section{Czas dostępności informacji}
+\section{Dostępność informacji w czasie}
 
-Nie wszyscy kierowcy kończą okrążenie o tym samym czasie. Dla próbki
-$(r,d,t)$ dane rywala muszą spełniać ograniczenie czasu $\leq T$, a nie
-jedynie mieć numer okrążenia $\leq t$. W szczególności samochód z tyłu
-może przekroczyć linię na tym samym okrążeniu dopiero po chwili predykcji.
-Projekt przewiduje dlatego użycie poprzedniego okrążenia przy luce do
-samochodu z tyłu i odcięcie czasowe przy zliczaniu wjazdów rywali.
-Implementacja tych cech pozostaje przyszłą pracą.
+Wyciekiem informacji byłoby użycie przy prognozie obserwacji, która
+nie istniała jeszcze w chwili $T$. Kierowcy kończą okrążenia w różnych
+momentach, dlatego dla danych rywala sam numer okrążenia nie wystarcza.
+Samochód z tyłu może zakończyć to samo okrążenie dopiero po chwili
+prognozy. Projekt przewiduje używanie wcześniejszego okrążenia przy
+luce do samochodu z tyłu i odcięcie czasowe przy zliczaniu wjazdów
+rywali. Każdy strumień i każdy kierowca muszą podlegać temu samemu
+ograniczeniu $\mathrm{czas}\leq T$.
 
-Planowana liczba okrążeń także nie jest stałą niezależną od czasu.
-Loader zachowuje ostatnią niepustą zapowiedź \code{TotalLaps}.
-W zatrzymanych po wykluczeniach przykładach \code{2023_14_R} i
-\code{2025_11_R} ostatnie komunikaty występują jednak przed wszystkimi
-zarejestrowanymi końcami okrążeń (tab.~\ref{tab:counts}). Te obserwacje
-potwierdzają zmienność metadanych, lecz nie pokazują wycieku przyszłej
-liczby do konkretnych próbek tych dwóch wyścigów.
+Planowana liczba okrążeń również może się zmieniać. Loader FastF1
+zachowuje ostatnią niepustą zapowiedź \code{TotalLaps}. W dwóch
+zachowanych po wykluczeniach przykładach, \code{2023_14_R}
+i \code{2025_11_R}, ostatnie zapowiedzi poprzedzały jednak wszystkie
+zarejestrowane końce okrążeń. Wykazano więc zmienność metadanych,
+a nie wyciek przyszłej liczby do konkretnych próbek tych dwóch
+wyścigów. Zachowanie zapowiedzi z czasem umożliwia dalszą kontrolę,
+lecz kontrakt ich użycia i postępowanie przed pierwszą znaną zapowiedzią
+pozostają nieustalone. Liczby planowanej nie wolno zastępować
+największym numerem okrążenia zaobserwowanym po zakończeniu wyścigu.
 
-\begin{table}[htbp]
-\centering\small
-\caption{Zapowiedzi liczby okrążeń i ich relacja czasowa; sekundy sesji, audyt T0.}
-\label{tab:counts}
-\begin{tabular}{llll}
-\toprule
-Wyścig & Kolejne liczby & Ostatnia zapowiedź & Pierwszy koniec okrążenia \\
-\midrule
-\code{2023_14_R} & $53\to52\to51$ & 4411.732 & 5028.992 \\
-\code{2025_11_R} & $71\to70$ & 3485.191 & 4357.412 \\
-\bottomrule
-\end{tabular}
-\end{table}
+Flaga \code{IsAccurate} opisuje przydatność pomiaru czasu, nie
+przydatność próbki do etykietowania. Usunięcie wszystkich wierszy
+z flagą fałszywą usunęłoby także okrążenia wjazdowe i wyjazdowe.
+Flaga ma więc maskować tylko cechy czasowe. Audyt potwierdził również,
+że niedokładność pierwszego okrążenia po statusie równym dokładnie
+\code{4} nie uogólnia się na każdy status mieszany zawierający
+\code{4}~\cite{findings}. Źródłowy status musi zachować to rozróżnienie.
 
-T2 zachowuje komunikaty ze znacznikami czasu jako materiał dowodowy.
-Nie oznacza to zatwierdzenia kontraktu ich odczytu przez budowę zbioru.
-Sposób obsługi próbek sprzed pierwszej zapowiedzi pozostaje otwarty
-w D5. Nie wolno zastępować liczby planowanej największym zaobserwowanym
-numerem okrążenia: dla Japonii 2022 są to odpowiednio 53, 29 we wszystkich
-wierszach i 28 po pominięciu wierszy wygenerowanych~\cite{findings}.
+Docelowe cechy i okna wymagają dopiero testów przyczynowych:
+ponowne obliczenie po usunięciu wszystkich danych późniejszych niż
+$T$ powinno dawać ten sam wynik co obliczenie na pełnym wejściu.
+Wypełnianie braków może korzystać wyłącznie z wcześniejszych obserwacji,
+a statystyki standaryzacji tylko z części uczącej. Istniejące kontrole
+formatu i zachowanie znaczników czasu stanowią do tego podstawę,
+ale nie zastępują takiego testu.

@@ -216,5 +216,19 @@
     "sha256": "f30bff5fdaa6c280203483e878ca1e4c9189761e7471b6e8a83d74d93e09c410",
     "status": "local candidate; human data acceptance and release publication pending"
   },
-  "candidate_manifest_sha256": "36ee960d81516ad4c3a4b514686d13da667f393868d567b39c99557ea376f0f5"
+  "candidate_manifest_sha256": "36ee960d81516ad4c3a4b514686d13da667f393868d567b39c99557ea376f0f5",
+  "editorial_revision": {
+    "kind": "R0-edit1 editorial consolidation",
+    "date": "2026-11-09",
+    "source_scope_changed": false,
+    "previous_report_commit": "66efab4fb519aa255afd1961a1991f13d41d6dd7",
+    "reviewed_pdf_sha256": "61a6dcc393a4124ec8e532ea9b6255c1db308c9d631cf40c698cbde1322dee77",
+    "reviewed_pdf_pages": 15,
+    "assessment": {
+      "path": "reports/R0-editorial-review.md",
+      "sha256": "84aa05c272c46bd7e1cb72754906a6c85d721098619b2277d4d8fffc77794280",
+      "bytes": 7633
+    },
+    "prior_copy": "build/archive/pre-edit1/ (local, ignored)"
+  }
 }

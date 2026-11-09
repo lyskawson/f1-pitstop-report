@@ -1,91 +1,111 @@
-\Chapter{Architektura i technologie}
-\label{ch:architecture}
+\Chapter{Metody i realizacja}
+\label{ch:methods}
 
-\section{Podział odpowiedzialności programu}
+\section{Przepływ danych i interfejsy}
 
-Projekt jest pakietem Pythona w układzie \code{src/pitstop}.
-Wspólnym punktem wejścia jest polecenie \code{pitstop}, zbudowane za
-pomocą \code{argparse}. Oddzielne moduły odpowiadają etapom przetwarzania,
-a \code{contracts.py} definiuje nazwy, typy, kolejność cech i walidatory.
-Taki podział ogranicza zależność między autorami kolejnych etapów:
-odbiorca może sprawdzić format wejścia bez znajomości sposobu jego
-wytworzenia. Sam poprawny format nie dowodzi jednak poprawności
-merytorycznej etykiety ani przyczynowości cech.
+Program jest pakietem Pythona podzielonym według etapów przetwarzania.
+Wspólny interfejs wiersza poleceń (CLI) oddziela sposób uruchamiania
+od obliczeń, a kontrakty określają formaty przekazywanych danych.
+Rysunek~\ref{fig:flow} pokazuje, gdzie kończy się działająca część
+przepływu i zaczynają etapy projektowane~\cite{project}.
 
 \begin{figure}[htbp]
 \centering\small
 \begin{tabular}{c}
 \fbox{\strut Człowiek: pobranie do cache FastF1} \\[5pt]
 $\downarrow$ \\[3pt]
-\fbox{\strut T2 offline: normalizacja $\to$ snapshot i manifest $\to$ weryfikacja} \\[5pt]
+\fbox{\strut Offline: normalizacja $\to$ snapshot i manifest $\to$ weryfikacja} \\[5pt]
 $\downarrow$ \\[3pt]
 \fbox{\strut Plan: etykiety $\to$ podziały $\to$ cechy i okna $\to$ zbiór} \\[5pt]
 $\downarrow$ \\[3pt]
 \fbox{\strut Plan: uczenie $\to$ predykcje $\to$ ocena $\to$ panel}
 \end{tabular}
-\caption{Przepływ danych z zaznaczeniem działającej i planowanej części.
-Opracowanie na podstawie modułów projektu.}
+\caption{Przepływ od źródła do planowanej prezentacji prognoz.}
 \label{fig:flow}
 \end{figure}
 
-CLI obsługuje eksport \code{download --from-cache} z wymaganymi
-argumentami oraz weryfikację \code{verify-data --manifest}.
-Nazwa pierwszego polecenia wynika ze wspólnego interfejsu, ale ten
-wariant eksportuje istniejący cache bez dostępu do sieci.
-Polecenia \code{build-dataset}, \code{train}, \code{predict},
-\code{evaluate} i \code{export-demo} są zapowiedzią interfejsów:
-obecnie wypisują komunikat o braku implementacji i kończą się kodem 1.
-Moduły modeli zawierają opisy zamierzonej odpowiedzialności, bez klas
-realizujących obliczenia~\cite{project}.
+Wejściem eksportu jest pamięć podręczna zawierająca żądane sesje.
+Program normalizuje typy, zachowuje surowe okrążenia i łączy je
+z metadanymi wyścigów oraz strumieniami zdarzeń. Wyjściem jest snapshot,
+czyli nazwana i niezmienna wersja plików, wraz z manifestem opisującym
+ich pochodzenie, rozmiary, skróty SHA-256, pokrycie i powody wykluczeń.
+Podział ten pozwala oddzielić jednorazowe pozyskanie danych od ich
+wielokrotnego wykorzystania w eksperymentach.
 
-\section{Środowisko i rola bibliotek}
+Eksport blokuje połączenia sieciowe i uwierzytelnienie. Brak odpowiedzi
+w cache jest błędem, nawet jeśli biblioteka wewnętrznie stłumi problem
+odczytu. Niekompletnego wejścia nie można w ten sposób pomylić
+z poprawnym zbiorem. Surowe wiersze, także wygenerowane, niedokładne
+i niejednoznaczne, pozostają zachowane; wykluczenia są metadanymi.
+Pozwala to odtworzyć konsekwencje późniejszej reguły etykiet lub
+czyszczenia bez ponownego pobierania źródła.
 
-Projekt wymaga Pythona 3.12. Menedżer \code{uv} odtwarza środowisko
-z \code{pyproject.toml} i wersjonowanego \code{uv.lock}.
-Tabela~\ref{tab:tech} podaje wersje zapisane w tej blokadzie; nie jest
-wykazem bibliotek użytych w przeprowadzonym treningu.
+Snapshot powstaje najpierw w obszarze roboczym. Po sprawdzeniu plików
+program pakuje archiwum, rozpakowuje je i weryfikuje ponownie przed
+nadaniem docelowej nazwy. Istniejącej wersji nie zastępuje.
+Odbiorca może uruchomić sam weryfikator bez cache, poświadczeń
+i importowania FastF1. Sprawdza on zarówno integralność bajtów, jak
+i zgodność treści: typy, klucze, tożsamość wyścigów, znaczniki czasu
+oraz pokrycie i wykluczenia obliczone ponownie z tabel.
+To istotne, ponieważ zgodny skrót potwierdza tożsamość pliku, a nie
+sens jego zawartości.
+
+Nie wszystkie źródła mają tę samą podstawę czasu: status toru używa
+sekund sesji, komunikaty kontroli wyścigu zachowują czas UTC,
+a zapowiedzi liczby okrążeń pozostają materiałem archiwalnym.
+Eksport nie nadaje im jeszcze znaczenia cech. Nieznany czas pobrania
+istniejącego cache jest oznaczony jako brak z wyjaśnieniem, osobno od
+czasu budowy snapshotu. Formalne domknięcie tego opisu pochodzenia
+i akceptacja danych pozostają odrębne od ukończenia kodu importu.
+
+\section{Reprezentacja wejść do metod}
+
+Kontrakty wymagają jednoznacznego powiązania okrążenia, etykiety
+i wektora wejściowego. Planowana tabela próbek oraz tablice cech mają
+wspólny identyfikator \code{row_id} w tej samej kolejności. Dzięki temu
+walidacja wykrywa również zamianę kolejności poprawnych numerycznie
+wierszy, która inaczej mogłaby przypisać cechy do niewłaściwej odpowiedzi.
+
+Dla $N$ próbek zaplanowano macierz tablicową
+$X_{\mathrm{tab}}\in\mathbb{R}^{N\times15}$ oraz tensor sekwencyjny
+$X_{\mathrm{seq}}\in\mathbb{R}^{N\times15\times16}$.
+Pierwsza zawiera 15 cech bieżącego okrążenia; drugi obejmuje 15
+kolejnych kroków historii i dodatkowy kanał \code{is_pad}, oznaczający
+dołożone z lewej strony zera dla krótkiej historii. Cechy mają opisywać
+opony, przebieg stintu, tempo, pozycję i kontekst stawki.
+Walidatory już sprawdzają kształty, skończoność wartości i poprawność
+dopełnienia. Z samej tablicy nie ustalą jednak, czy wszystkie kroki
+pochodzą od jednego kierowcy i kończą się na $t$; ta własność należy
+do przyszłej kontroli budowy okien.
+
+\section{Technologie i dalsze metody}
+
+Python 3.12 i menedżer \code{uv} tworzą wspólne środowisko,
+odtwarzane z wersjonowanej blokady zależności. Tabela~\ref{tab:tech}
+wiąże najważniejsze narzędzia z ich rolą. Szczegółowe wersje i ustawienia
+uruchomienia pozostają w plikach środowiska i instrukcjach projektu.
 
 \begin{table}[htbp]
 \centering\small
-\caption{Technologie zapisane w źródłowej rewizji projektu.}
+\caption{Rola technologii w realizacji projektu.}
 \label{tab:tech}
-\begin{tabularx}{\textwidth}{L{0.24\textwidth}L{0.18\textwidth}Y}
+\begin{tabularx}{\textwidth}{L{0.33\textwidth}Y}
 \toprule
-Technologia & Wersja & Rola i aktualny zakres \\
+Technologia & Zastosowanie \\
 \midrule
-FastF1 & 3.9.0a0 & Odczyt cache oraz audyt źródła. \\
-pandas / NumPy & 2.3.3 / 2.5.4 & Tabele, typy i walidacja tablic. \\
-PyArrow & 26.0.0 & Zapis i odczyt Parquet. \\
-PyYAML & 6.0.3 & Odczyt kompletnych konfiguracji YAML. \\
-scikit-learn & 1.9.1 & Zależność dla planowanych metod i metryk. \\
-PyTorch & 2.14.1 & Opcjonalne \code{train}; planowane sieci i pętla uczenia. \\
-LightGBM & 4.7.0 & Opcjonalne \code{train}; planowany model porównawczy. \\
-pytest / pytest-socket & 9.1.1 / 0.8.1 & Testy i blokada gniazd sieciowych. \\
-Ruff & 0.17.1 & Kontrola i formatowanie kodu. \\
+FastF1 & Odczyt źródła i audyt danych wyścigowych. \\
+pandas, NumPy, PyArrow & Przetwarzanie tabel i tablic oraz zapis Parquet. \\
+YAML, \code{uv} & Jawne konfiguracje i odtwarzanie środowiska. \\
+pytest, pytest-socket, Ruff & Testy offline oraz kontrola jakości kodu. \\
+PyTorch, scikit-learn, LightGBM & Zależności dla planowanych modeli i metryk. \\
+Streamlit & Planowana prezentacja gotowych prognoz. \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-Blokada zawiera także wariant \code{2.14.1+cpu} PyTorch dla właściwych
-platform; CPU jest urządzeniem referencyjnym. CUDA i MPS są opcjonalne
-w projekcie docelowym. Streamlit jest planowaną technologią panelu,
-lecz w tej rewizji nie ma jeszcze aplikacji ani jej osobnego środowiska.
-Nie można zainstalowanej biblioteki utożsamiać z gotowym komponentem.
-
-Konfiguracje nie dziedziczą po sobie: każdy plik modelu powtarza potrzebne
-ścieżki i parametry. Ułatwia to zapis pełnego opisu przyszłego eksperymentu
-bez ukrytych ustawień. Ziarno losowości zaczyna się od 42, ale obecność
-tej wartości w konfiguracji nie jest dowodem wykonania eksperymentu.
-
-\section{Automatyczna kontrola zmian}
-
-GitHub Actions uruchamia instalację z blokady, \code{ruff check},
-\code{ruff format --check} i \code{pytest}. CI ustala \code{uv 0.11.7}
-i Pythona 3.12. Pobranie zależności jest częścią przygotowania środowiska;
-same testy mają blokadę połączeń internetowych. Nie korzystają z konta
-F1 TV ani z pełnego cache wyścigowego.
-
-D10 przewiduje w przyszłości także krótki trening na danych testowych,
-ale aktualny plik workflow nie zawiera takiego kroku. Sieci, pętla uczenia
-i panel wymagają dopiero implementacji. To rozróżnienie pozwala odczytać
-zielony wynik CI zgodnie z rzeczywistym zakresem kontroli.
+Dalsze porównanie ma objąć stały wynik równy częstości klasy dodatniej,
+regresję logistyczną i LightGBM oraz sieci neuronowe: perceptron
+wielowarstwowy (MLP), sieć rekurencyjną z komórką GRU i czasową sieć
+konwolucyjną (TCN). Metody tablicowe mają otrzymywać stan na końcu
+okrążenia, a sekwencyjne jego historię. CPU jest urządzeniem
+referencyjnym. Istniejące konfiguracje utrwalają te założenia.

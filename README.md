@@ -79,12 +79,28 @@ normally. Neither integration is an automatic background updater of this report.
 
 ## Evidence and maintenance
 
+- `runbook.md`: technical details, exact versions, CLI behavior and operational
+  controls kept outside the academic narrative.
 - `evidence-map.md`: claims, selectors, revisions, limitations and course checklist.
 - `evidence/provenance.json`: SHA-256 identities of consulted source/evidence
   artifacts and the template, with no private machine paths.
 - `evidence/summary.json`: selected existing aggregate findings, no raw data/logs.
 - `report-state.json`: frozen application revision, covered stages, unresolved
   questions and exact build/visual-check status.
+
+The current PDF uses five chapters: goal/scope, data/preparation,
+methods/implementation, experiments/results, and discussion/conclusions.
+Label uncertainty and causal availability have one main home in chapter 2;
+the compact completion summary is in chapter 5. Existing software checks and
+a short future experiment plan share chapter 4. Replace plans with realized
+methods/results as work lands rather than keeping both accounts.
+
+The first 15-page version is retained in Git history at `66efab4`, with a local
+PDF/source backup in ignored `build/archive/pre-edit1/`. The current editorial
+target is 9–11 pages without changing fonts or margins. For the final report,
+18–22 pages is only a planning envelope: reserve roughly half the body for
+models, experimental method, results and interpretation, and adjust when actual
+content warrants it. All course requirements take precedence over page counts.
 
 On a later request to update the report, resolve accepted local application
 `main` once and read files at that exact SHA (read-only `git show` or an archive).

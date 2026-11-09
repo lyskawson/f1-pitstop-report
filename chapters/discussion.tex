@@ -1,47 +1,63 @@
-\Chapter{Wyniki i ograniczenia}
+\Chapter{Dyskusja i wnioski}
 \label{ch:discussion}
 
-Wynikiem bieżącego etapu jest działająca część infrastruktury danych
-oraz sprawdzalna diagnoza ich ograniczeń. Eksport i niezależny od cache
-weryfikator umożliwiają przekazanie zespołowi tej samej wersji wejścia.
-Zachowanie surowych wierszy pozwala wrócić do niejednoznacznych wizyt
-w alei, zamiast utrwalać niepewne odpowiedzi już podczas importu.
-To warunek dalszego eksperymentu, ale nie dowód osiągnięcia celu
-predykcyjnego.
+\section{Znaczenie dotychczasowej realizacji}
 
-Najważniejsze ograniczenie jest semantyczne. Poprawne typy i zgodne
-skróty plików nie rozstrzygają, czy opisane zdarzenie było wymianą opon.
-Audyt podważył wskaźnik oparty na \code{Stint}; wysoka zgodność z rejestrem
-wizyt Jolpica nie usuwa problemu, ponieważ oba źródła mogą opisywać
-przejazdy związane z karą. Wdrożenie etykiety przed rozstrzygnięciem D2
-mogłoby doprowadzić do uczenia innego zadania niż zadeklarowane.
+Wspólna, sprawdzalna wersja danych pozwala oddzielić błąd metody od
+różnicy wejścia. Zachowanie surowych obserwacji daje możliwość powrotu
+do niejednoznacznego zdarzenia, zamiast utrwalać niepewną odpowiedź
+już przy imporcie. Jest to ważny rezultat przygotowania eksperymentu:
+zespół może wyjaśnić, co zostało zapisane i jakie kontrole przeszło.
+Nie wynika z tego jeszcze przydatność przyszłej prognozy.
 
-Drugie ograniczenie dotyczy dostępności czasowej. Zachowane zapowiedzi
-liczby okrążeń umożliwią zbadanie, co było wiadomo w chwili $T$, ale
-nie zastępują kontraktu ich użycia. Trzeba też obsłużyć początek historii
-przed pierwszą znaną zapowiedzią. Podobnie poprawny kształt okna
-sekwencyjnego nie dowodzi, że w jego obliczeniu nie wykorzystano
-przyszłości innego kierowcy. Dopiero implementacja i testy przyczynowe
-pozwolą taką własność potwierdzić.
+Najważniejszą lekcją audytu jest konieczność sprawdzenia znaczenia
+zmiennej docelowej przed uczeniem. Wysoka zgodność dwóch rejestrów
+może współistnieć ze wspólnym błędem interpretacji zdarzenia.
+Podobnie poprawny format macierzy nie przesądza o dostępności jej
+wartości w momencie prognozy. Ograniczenia etykiety i czasu z rozdziału
+\ref{ch:data} wyznaczają zatem kolejność dalszej pracy, nie są jedynie
+uwagami do gotowego modelu.
 
-Ograniczenie populacji do wyścigów suchych i bez czerwonej flagi zmniejsza
-liczbę trudnych sytuacji, ale zawęża przyszłe zastosowanie modelu.
-Nie będzie można bez osobnej oceny przenosić wniosków na deszcz,
-przerwane wyścigi, sprinty ani następne sezony. Nawet w przyjętym
-zakresie braki historii opon i szczególne regulacje wymagają jawnego
-raportowania. Określenie kompletności w manifeście odnosi się do
-żądanego eksportu i zapisanych kontroli, a nie do pełnej obserwowalności
-procesu podejmowania decyzji przez zespoły.
+Tabela~\ref{tab:status} zbiera stopień realizacji celu.
+Przyjęcie kodu eksportu oznacza ukończenie komponentu, natomiast
+akceptacja konkretnego snapshotu obejmuje także jego pochodzenie
+i jakość. Tych dwóch stanów nie należy utożsamiać.
 
-Na tym etapie nie można odpowiedzieć, która metoda prognozuje najlepiej,
-jaki jest poziom fałszywych alarmów ani czy sieci przewyższają LightGBM.
-Nie ma podstaw do rysowania krzywych wyników ani wypełniania tabel
-przykładowymi metrykami. Po ukończeniu pipeline'u użyteczność powinna
-być oceniana na zamrożonym protokole, z podziałem na zieloną flagę,
-SC/VSC i wyścigi ze szczególnymi regułami opon.
+\begin{table}[htbp]
+\centering\small
+\caption{Stopień realizacji celu w opisywanej rewizji.}
+\label{tab:status}
+\begin{tabularx}{\textwidth}{L{0.28\textwidth}Y}
+\toprule
+Stan & Zakres \\
+\midrule
+Wykonane & Szkielet pakietu, kontrakty i walidatory, środowisko, testy i CI, audyt źródła, eksport i weryfikacja snapshotu offline. \\
+Oczekujące rozstrzygnięcia & Formalny opis pochodzenia i akceptacja danych, reguła etykiety oraz czasowe wykorzystanie zapowiedzi liczby okrążeń. Publikacja archiwum pozostaje osobnym krokiem. \\
+Dalsza realizacja & Budowa próbek i cech, modele, uczenie i ocena predykcji oraz panel demonstracyjny. \\
+\bottomrule
+\end{tabularx}
+\end{table}
 
-Realistyczny przyszły panel może wspierać analizę powtórek: pokazywać
-przebieg prawdopodobieństwa, moment alarmu oraz zaobserwowaną wymianę
-opon. Wynik pozostanie prognozą zachowania w warunkach danych
-historycznych. Ocenę optymalnego momentu zjazdu należałoby oprzeć na
-innym zadaniu, modelu skutków decyzji i dodatkowych dowodach.
+\section{Zastosowania i granice wnioskowania}
+
+Realistyczny panel może wspierać analizę powtórek wyścigów: pokazywać
+prawdopodobieństwo, próg alarmu i zdarzenie, z którym prognoza ma być
+porównana. Pozwoliłoby to badać moment pojawienia się sygnału i rodzaje
+fałszywych alarmów. Użyteczność zależy jednak zarówno od jakości
+rankingu, jak i wyprzedzenia zdarzenia; pojedyncza wysoka metryka nie
+opisze całego zachowania systemu.
+
+Wykluczenie deszczu i czerwonych flag ułatwia zdefiniowanie pierwszego
+zadania, ale ogranicza populację, do której będą odnosić się wyniki.
+Szczególne regulacje opon mogą zmieniać zachowanie zespołów nawet
+w pozostałych wyścigach. Z tego powodu przyszłe porównanie powinno
+interpretować wyniki w kontekście warunków danych, zamiast
+przedstawiać jedną liczbę jako uniwersalną własność metody.
+
+Docelowy system pozostanie prognozą zachowania na podstawie historii.
+Nie obserwuje pełnego procesu decyzyjnego zespołu i nie rozstrzyga,
+czy inny zjazd poprawiłby wynik sportowy. Najbliższy uzasadniony krok
+to domknięcie znaczenia etykiet i reguł czasowych, a następnie zbudowanie
+zbioru, na którym testy przyczynowe i porównanie metod będą rzeczywiście
+możliwe. Utrzymanie tego związku między celem, danymi i oceną ma większe
+znaczenie niż sama liczba wdrożonych architektur.

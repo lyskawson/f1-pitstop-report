@@ -115,8 +115,8 @@
       "positive_evidence": {"compound_change": 1337, "same_compound_age_discontinuity": 369}
     },
     "t4d_lap_time_rel_zero_cells_first_build": 2389,
-    "test_suite_ci_at_t12_merge": 359,
-    "note": "Transcribed author-report aggregates; the report writer did not rerun the dataset build or tests. CI result for 1c76890 itself was not inspected."
+    "test_suite_ci_at_1c76890": 363,
+    "note": "Transcribed author-report aggregates; the report writer did not rerun the dataset build or tests. CI of 1c76890: GitHub Actions run 45828093141, success, 363 passed."
   },
   "validation_v1": {
     "source": "reports/validation-v1.json / .md at 1c76890244470588e5778fe38ad63579aca4f9d4",

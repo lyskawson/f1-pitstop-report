@@ -7,8 +7,8 @@ Poprawność programu sprawdzają testy offline, a połączenia sieciowe są
 w nich zablokowane. Używają one dwóch pełnych, wersjonowanych wyścigów
 z sezonu 2022 (Bahrajn i Arabia Saudyjska) oraz syntetycznych przypadków
 z celowo uszkodzonymi danymi. Tabela~\ref{tab:tests} pokazuje przykłady.
-Przy włączeniu oceny testowej ciągła integracja (GitHub Actions)
-uruchamiała 359 testów i kontrolę kodu Ruff z wynikiem pozytywnym.
+Dla opisanej wersji kodu ciągła integracja (GitHub Actions)
+uruchomiła 363 testy i kontrolę kodu Ruff z wynikiem pozytywnym.
 
 \begin{table}[htbp]
 \centering\small
@@ -37,7 +37,7 @@ Badanie obejmuje sześć modeli z trzema ziarnami losowymi (42, 43 i 44)
 na dziesięciu wyścigach walidacyjnych. Konfiguracje sieci wybrano na
 walidacji przy ziarnie 42, więc wyniki walidacyjne wybranych konfiguracji
 są zawyżone przez sam wybór. Przykładowo najlepsze strojenie TCN dało AP
-0,150, a średnia z trzech ziaren wyniosła 0,141. Wszystkie przebiegi pochodzą
+0,149, a średnia z trzech ziaren wyniosła 0,141. Wszystkie przebiegi pochodzą
 z jednej rewizji kodu~\cite{validation}.
 
 Przy odsetku dodatnich 0,028 stała prognoza osiąga AP 0,028. Regresja

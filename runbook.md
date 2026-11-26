@@ -82,9 +82,9 @@ train-only preprocessing. Selection and early stopping on val AP, threshold
 maximizing val F1 (larger threshold on ties), frozen for test. Event windows k=1
 (main), k=2 (auxiliary). Race-level bootstrap, B=1000, paired for comparisons;
 a CI containing 0 is a tie. AP or F1 above 0.6 raises the leak alarm. The test
-split was evaluated once (approval in `reports/test-v1-freeze.json`). The 359-test
-figure is the CI result at the T12 merge; the CI of the T12b merge commit was not
-inspected here.
+split was evaluated once (approval in `reports/test-v1-freeze.json`). The 363-test
+figure is the CI result of the T12b merge commit 1c76890 (GitHub Actions run
+45828093141, success).
 
 ## Evidence and document reproduction
 

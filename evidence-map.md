@@ -23,7 +23,7 @@ links (repository, findings, data-v1 release, validation and test reports).
 | Previous source main | `5ba376f904b58caf2072ce807cc822db7a90ccc6` | T2, scope of the first report. |
 | T11 runs produced at | `f91914766761844937bd1e83e77740daa5af8a17` | Code revision of all 36 runs; validation study. |
 | T12 test evaluation at | `75b39bc7d1c3ceaf01cd53ae904dabbaf81041f9` | Single locked test evaluation. |
-| T12 merge | `19cfcb01341da7d938cab5484e28415694778f39` | PR #21, 359 tests in CI per handoff. |
+| T12 merge | `19cfcb01341da7d938cab5484e28415694778f39` | PR #21, 359 tests in CI per handoff; T12b merge 1c76890: 363 tests, CI run 45828093141. |
 | Demo export commit | `0b0b55e5fa32b604fc8548dd127337e89e85b8e6` | `demo/metadata.json`: `export_git_commit`. |
 | T0 corrected audit | `49a38c9089cfa992287f832ef48b57f6089f72ef` | Corrected `summary-after.json`. |
 | Snapshot producer | `e96ae051380b927f20017dfb98f411f0a3ffe38e` | Produced data-v1 candidate. |
@@ -56,7 +56,7 @@ Chapter and section numbers refer to the five-chapter report.
 | 3.3, tuning grid, seeds, per-run times | `validation-v1.md` Tuning; HANDOFF environment notes | Grid lr x hidden at seed 42; times at 12 threads. |
 | 3.4, metric and threshold procedure | D8; `metrics.py`, `evaluate.py`; runbook T5 | Synthetic verification only for perfect scores. Leak alarm at 0.6. |
 | 3.5, dashboard and demo pack | `app/streamlit_app.py`, runbook T7/T12b, `demo/metadata.json` | Pack: 3 races, seed-42 runs, event names, SHA-256 of payloads. Heatmap, comparison view and deployment not implemented. |
-| 4.1, tests and 359 CI | `HANDOFF.md` stage table; `accepted-work.md` | 359 refers to the T12 merge. CI of 1c76890 not inspected. Review finding: rival PitInTime leak fixed in T4. |
+| 4.1, tests and 363 CI | GitHub Actions run 45828093141 for 1c76890 (363 passed) | Checked by the orchestrator. Review finding: rival PitInTime leak fixed in T4. |
 | 4.2, validation results | `reports/validation-v1.md` Tuning, Models, Green vs SC/VSC, paired bootstrap | Means over seeds 42-44; val bias caveat quoted from the report. |
 | 4.3, Table 4.2 test results | `reports/test-v1.md` Models val vs test, test groups, paired bootstrap | Single evaluation; no ranking claimed; 11 races. |
 | 4.3, val to test comparison | Both reports | Interpretation: selection bias plus different races. Not tested separately. |

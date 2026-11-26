@@ -5,30 +5,37 @@ Zjazd do alei serwisowej zmienia przebieg wyścigu: samochód traci czas
 na przejazd i obsługę, a po wymianie opon może uzyskać inne tempo.
 Celem projektu jest oszacowanie na końcu okrążenia kierowcy
 prawdopodobieństwa, że na następnym okrążeniu zjedzie on po nowe opony.
-System ma łączyć odtwarzalne przygotowanie danych, porównanie metod
-uczenia maszynowego i czytelną prezentację prognoz w panelu wyścigu.
+System łączy odtwarzalne przygotowanie danych, porównanie metod
+uczenia maszynowego i prezentację prognoz w panelu wyścigu.
 Kryterium powodzenia stanowi rzetelne porównanie metod na wspólnych
 warunkach, bez założonej z góry przewagi sieci neuronowych.
 
 Jednostką analizy jest próbka $K=(r,d,t)$: wyścig $r$, numer kierowcy $d$
 i numer właśnie zakończonego okrążenia $t$. Odpowiedź
-$y_{r,d,t}\in\{0,1\}$ ma oznaczać wymianę opon na okrążeniu $t+1$.
+$y_{r,d,t}\in\{0,1\}$ oznacza wymianę opon na okrążeniu $t+1$.
 Wejście modelu musi odpowiadać wiedzy dostępnej w chwili
 $T=\mathrm{Time}(r,d,t)$, czyli na końcu okrążenia $t$. W historycznym
-zapisie dalsze okrążenia mogą służyć do ustalenia odpowiedzi, lecz nie
-mogą wejść do prognozy. Rozdział~\ref{ch:data} przedstawia konsekwencje
-tej zasady dla etykiet, historii kierowców i danych całej stawki.
+zapisie dalsze okrążenia służą do ustalenia odpowiedzi, lecz nie
+mogą wejść do prognozy. Rozdział~\ref{ch:data} opisuje konsekwencje
+tej zasady dla etykiet, cech i danych całej stawki.
 
 Przewidywanie zachowania zespołu nie rozstrzyga, czy jego decyzja była
 optymalna. Projekt nie wyznacza strategii minimalizującej czas wyścigu
 ani nie szacuje skutku alternatywnego momentu zjazdu. Jego zastosowaniem
-może być analiza historyczna: zestawienie oczekiwanego zdarzenia
+jest analiza historyczna: zestawienie oczekiwanego zdarzenia
 z rzeczywistym przebiegiem wyścigu i warunkami, w których pojawił się
-alarm. Ocena takiej użyteczności wymaga późniejszych eksperymentów.
+alarm.
 
 \section{Zakres problemu}
 
-Dane obejmują sesje Race sezonów 2022--2025~\cite{project}. Ograniczenie do wyścigów
-suchych i bez czerwonej flagi pozwala skupić się na węższym, możliwym
-do objaśnienia zadaniu. Nie uzasadnia ono przenoszenia wniosków na
-sprinty, deszcz lub inne sezony.
+Dane obejmują sesje Race sezonów 2022--2025~\cite{project}. Ograniczenie
+do wyścigów suchych i bez czerwonej flagi pozwala skupić się na węższym,
+możliwym do objaśnienia zadaniu. Nie uzasadnia ono przenoszenia wniosków
+na sprinty, deszcz lub inne sezony.
+
+Porównujemy trzy punkty odniesienia (stałą prognozę, regresję logistyczną
+i LightGBM) oraz trzy sieci neuronowe: perceptron wielowarstwowy, sieć
+rekurencyjną GRU i czasową sieć konwolucyjną. Wyniki ma pokazywać panel
+w Streamlit. Rozdział~\ref{ch:methods} opisuje wykonane etapy,
+rozdział~\ref{ch:experiments} wyniki, a rozdział~\ref{ch:discussion}
+stopień realizacji celu.

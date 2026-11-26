@@ -3,25 +3,43 @@
 
 \section{Wnioski z realizacji}
 
-Wspólna, sprawdzalna wersja danych pozwala oddzielić błąd metody od
-różnicy wejścia. Zachowanie surowych obserwacji daje możliwość powrotu
-do niejednoznacznego zdarzenia, zamiast utrwalać niepewną odpowiedź
-już przy imporcie. Jest to ważny rezultat przygotowania eksperymentu:
-zespół może wyjaśnić, co zostało zapisane i jakie kontrole przeszło.
-Nie wynika z tego jeszcze przydatność przyszłej prognozy.
+Główny rezultat to kompletny, odtwarzalny potok od archiwum danych do
+porównania sześciu modeli na wspólnych warunkach. Wszystkie etapy działają
+offline, a ocena na zbiorze testowym została wykonana raz, po zamrożeniu
+konfiguracji i progów. Dzięki temu różnice między modelami nie wynikają
+z różnic w danych, podziale lub progu.
 
-Najważniejszą lekcją audytu jest konieczność sprawdzenia znaczenia
-zmiennej docelowej przed uczeniem. Wysoka zgodność dwóch rejestrów
+Wyniki są umiarkowane i nie wskazują zwycięzcy. Wszystkie modele poza stałą
+prognozą rozpoznają okrążenia przed zjazdem wyraźnie lepiej niż losowo
+(AP około 0,10--0,12 przy odsetku dodatnich 0,024), ale sieci neuronowe
+są statystycznie nieodróżnialne od LightGBM w 8 z 9 porównań. W teście
+nieodróżnialna jest też regresja logistyczna. Dodatkowa złożoność sekwencyjnych modeli GRU
+i TCN nie przyniosła wykazanej korzyści względem modeli tablicowych.
+Zgodnie z założonym kryterium powodzenia jest to wynik poprawny, bo
+projekt nie zakładał przewagi sieci.
+
+Wyniki należy czytać z trzema zastrzeżeniami. Po pierwsze, wyniki
+walidacyjne są zawyżone przez wybór konfiguracji na tych samych danych,
+dlatego rzetelną ocenę daje wyłącznie test. Po drugie, test obejmuje
+11 wyścigów jednego sezonu, więc przedziały ufności są szerokie i pojedyncza
+różnica jednego ziarna nie ustala rankingu. Po trzecie, liczba fałszywych
+alarmów jest duża (od kilkudziesięciu do ponad stu na wyścig), a próg
+wybrany na walidacji z przewagą zielonej flagi nie daje w części modeli
+żadnych trafień przy SC i VSC. Rozdział~\ref{ch:data} wskazuje dodatkowo ograniczenia
+etykiety: zjazdy bez dowodu wymiany opon pomijamy, więc wyniki dotyczą
+zjazdów rozstrzygalnych na podstawie danych.
+
+Praktyczne lekcje dotyczą przede wszystkim danych. Znaczenie zmiennej
+docelowej trzeba sprawdzić przed uczeniem, bo zgodność dwóch rejestrów
 może współistnieć ze wspólnym błędem interpretacji zdarzenia.
-Podobnie poprawny format macierzy nie przesądza o dostępności jej
-wartości w momencie prognozy. Ograniczenia etykiety i czasu z rozdziału
-\ref{ch:data} wyznaczają zatem kolejność dalszej pracy, nie są jedynie
-uwagami do gotowego modelu.
+Poprawny format macierzy nie przesądza o tym, że wartości były dostępne
+w chwili prognozy, dlatego przyczynowość weryfikują testy, a nie opis.
+Niezależny przegląd kodu wykrył realny wyciek, co potwierdza potrzebę
+takich testów.
 
-Tabela~\ref{tab:status} zbiera stopień realizacji celu.
-Przyjęcie kodu eksportu oznacza ukończenie komponentu, natomiast
-akceptacja konkretnego snapshotu obejmuje także jego pochodzenie
-i jakość. Tych dwóch stanów nie należy utożsamiać.
+\section{Stopień realizacji celu}
+
+Tabela~\ref{tab:status} zbiera stan prac.
 
 \begin{table}[htbp]
 \centering\small
@@ -31,33 +49,31 @@ i jakość. Tych dwóch stanów nie należy utożsamiać.
 \toprule
 Stan & Zakres \\
 \midrule
-Wykonane & Szkielet pakietu, kontrakty i walidatory, środowisko, testy i CI, audyt źródła, eksport i weryfikacja snapshotu offline. \\
-Oczekujące rozstrzygnięcia & Formalny opis pochodzenia i akceptacja danych, reguła etykiety oraz czasowe wykorzystanie zapowiedzi liczby okrążeń. Publikacja archiwum pozostaje osobnym krokiem. \\
-Dalsza realizacja & Budowa próbek i cech, modele, uczenie i ocena predykcji oraz panel demonstracyjny. \\
+Wykonane & Archiwum danych z manifestem i weryfikacją offline, etykiety i podział, cechy przyczynowe i okna, sześć modeli (stała prognoza, regresja logistyczna, LightGBM, MLP, GRU, TCN), badanie walidacyjne, jedna ocena testowa, opublikowane przebiegi, paczka demonstracyjna z trzema wyścigami testowymi i widok wyścigu w panelu. \\
+Do wykonania & Widoki panelu: mapa ciepła stawki (kierowca $\times$ okrążenie) i porównanie modeli. Publikacja panelu w Streamlit Cloud. Końcowa dokumentacja i notebook Colab z powtórzeniem wyników offline. \\
+Poza zakresem & Strategia optymalna, wpływ alternatywnego zjazdu, deszcz, sprinty, inne sezony. \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
+Cel główny, czyli rzetelne porównanie metod w odtwarzalnym potoku, jest
+osiągnięty. Cel prezentacyjny jest osiągnięty częściowo: istnieje widok
+wyścigu na danych testowych, lecz panel nie jest jeszcze opublikowany i
+brakuje dwóch widoków.
+
 \section{Zastosowania i granice wnioskowania}
 
-Realistyczny panel może wspierać analizę powtórek wyścigów: pokazywać
-prawdopodobieństwo, próg alarmu i zdarzenie, z którym prognoza ma być
-porównana. Pozwoliłoby to badać moment pojawienia się sygnału i rodzaje
-fałszywych alarmów. Użyteczność zależy jednak zarówno od jakości
-rankingu, jak i wyprzedzenia zdarzenia. Pojedyncza wysoka metryka nie
-opisze całego zachowania systemu.
+Panel może wspierać analizę powtórek wyścigów. Pokazuje prawdopodobieństwo,
+próg alarmu i rzeczywisty zjazd, co pozwala badać, kiedy pojawia się sygnał
+i jakie są fałszywe alarmy. Użyteczność zależy zarówno od jakości
+rankingu, jak i od wyprzedzenia zdarzenia, więc pojedyncza metryka nie
+opisuje całego zachowania systemu.
 
-Wykluczenie deszczu i czerwonych flag ułatwia zdefiniowanie pierwszego
-zadania, ale ogranicza populację, do której będą odnosić się wyniki.
-Szczególne regulacje opon mogą zmieniać zachowanie zespołów nawet
-w pozostałych wyścigach. Z tego powodu przyszłe porównanie powinno
-interpretować wyniki w kontekście warunków danych, zamiast
-przedstawiać jedną liczbę jako uniwersalną własność metody.
-
-Docelowy system pozostanie prognozą zachowania na podstawie historii.
-Nie obserwuje pełnego procesu decyzyjnego zespołu i nie rozstrzyga,
-czy inny zjazd poprawiłby wynik sportowy. Najbliższy uzasadniony krok
-to domknięcie znaczenia etykiet i reguł czasowych, a następnie zbudowanie
-zbioru, na którym testy przyczynowe i porównanie metod będą rzeczywiście
-możliwe. Utrzymanie tego związku między celem, danymi i oceną ma większe
-znaczenie niż sama liczba wdrożonych architektur.
+Wyniki odnoszą się do wyścigów suchych, bez czerwonej flagi, z sezonów
+2022--2025. Szczególne regulacje opon mogą zmieniać zachowanie zespołów,
+a próbka testowa ma tylko jeden taki wyścig. System jest prognozą
+zachowania na podstawie historii. Nie obserwuje pełnego procesu
+decyzyjnego zespołu i nie rozstrzyga, czy inny zjazd poprawiłby wynik.
+Dalsza praca powinna zachować związek między celem, danymi i oceną,
+a ewentualne nowe cechy, na przykład pogoda, wymagają osobnej, przyczynowej
+walidacji.

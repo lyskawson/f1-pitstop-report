@@ -1,20 +1,14 @@
 \Chapter{Eksperymenty i wyniki}
 \label{ch:experiments}
 
-\section{Weryfikacja wykonanej części}
+\section{Weryfikacja oprogramowania}
 
-Dotychczasowe wyniki dotyczą jakości danych i poprawności programu.
-Nie ma jeszcze implementacji modeli, przebiegów uczenia ani
-predykcyjnych wyników walidacyjnych lub testowych. Kontrole opisane
-poniżej nie mierzą skuteczności przewidywania pit stopów.
-
-Testy wykorzystują pełne surowe tabele Bahrajnu i Arabii Saudyjskiej
-z sezonu 2022 jako małe, wersjonowane dane wejściowe (fixtures).
-Przypadki syntetyczne uzupełniają je o celowo uszkodzone obserwacje.
-Pozwala to sprawdzać zarówno zgodność z rzeczywistym formatem, jak
-i reakcję programu na konkretny błąd. Połączenia internetowe są
-blokowane, więc wynik nie zależy od dostępności zewnętrznego serwisu.
-Przykłady kontroli zawiera tabela~\ref{tab:tests}.
+Poprawność programu sprawdzają testy offline, a połączenia sieciowe są
+w nich zablokowane. Używają one dwóch pełnych, wersjonowanych wyścigów
+z sezonu 2022 (Bahrajn i Arabia Saudyjska) oraz syntetycznych przypadków
+z celowo uszkodzonymi danymi. Tabela~\ref{tab:tests} pokazuje przykłady.
+Przy włączeniu oceny testowej ciągła integracja (GitHub Actions)
+uruchamiała 359 testów i kontrolę kodu Ruff z wynikiem pozytywnym.
 
 \begin{table}[htbp]
 \centering\small
@@ -22,43 +16,91 @@ Przykłady kontroli zawiera tabela~\ref{tab:tests}.
 \label{tab:tests}
 \begin{tabularx}{\textwidth}{L{0.25\textwidth}Y}
 \toprule
-Cel kontroli & Sprawdzany przypadek i oczekiwane zachowanie \\
+Obszar & Sprawdzany przypadek \\
 \midrule
-Spójność interfejsów & Błędne typy, duplikaty kluczy i zamieniona kolejność \code{row_id} są odrzucane. \\
-Zachowanie obserwacji & Normalizacja braków nie usuwa okrążeń ani znaczników wjazdu i wyjazdu. \\
-Przenośność snapshotu & Archiwum po rozpakowaniu przechodzi weryfikację bez cache i FastF1. \\
-Kontrola treści & Usunięty zadeklarowany strumień lub całkowicie puste statusy/komunikaty są odrzucane także po przeliczeniu skrótów. \\
+Interfejsy & Błędne typy, zdublowane klucze i zamieniona kolejność \code{row_id} są odrzucane. \\
+Archiwum & Rozpakowana kopia przechodzi weryfikację bez cache i FastF1, a usunięty strumień lub wymazana treść są odrzucane. \\
+Etykiety i metryki & Ręcznie policzone przypadki dla zdarzeń, progów, remisów i bootstrapu. Wyniki idealne w tych testach dotyczą tylko poprawności obliczeń. \\
+Przyczynowość & Obcięcie wszystkich strumieni do czasu $T$ nie zmienia cech. Dane rywala po $T$ nie wpływają na próbkę, a okno kończy się w $t$. \\
+Modele i panel & TCN nie zależy od późniejszych kroków. Predykcja nie czyta wierszy testowych bez zgody. Panel działa na syntetycznej paczce. \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-Zachowany wynik kontroli przyjętej implementacji obejmuje 209 poprawnych
-testów, poprawne kontrole Ruff i zielony wynik ciągłej integracji
-w GitHub Actions. Świeżo rozpakowany kandydat danych przeszedł niezależny
-od cache odczyt przez właściwy interfejs programu. Próby z brakującym
-strumieniem lub wymazaną istotną treścią zostały odrzucone.
-Źródła wyników kontroli wskazuje mapa dowodów dołączona do źródeł raportu.
+Niezależny przegląd kodu wykrył wyciek w liczeniu wjazdów rywali do
+alei, który poprawiono przed włączeniem zmiany. Testy weryfikują program,
+a nie skuteczność predykcji. Tę oceniają dwa następne podrozdziały.
 
-Kontrole te uzasadniają wnioski o działaniu importu i walidacji.
-Nie potwierdzają znaczenia każdej etykiety ani przyczynowości
-niezaimplementowanych cech. Badanie jakości źródła, omówione
-w rozdziale~\ref{ch:data}, pozostaje osobnym rodzajem dowodu od oceny
-predykcyjnej. Aktualne CI uruchamia testy i kontrolę kodu, bez treningu
-modelu na danych próbnych.
+\section{Badanie na zbiorze walidacyjnym}
 
-\section{Plan porównania modeli}
+Badanie obejmuje sześć modeli z trzema ziarnami losowymi (42, 43 i 44)
+na dziesięciu wyścigach walidacyjnych. Konfiguracje sieci wybrano na
+walidacji przy ziarnie 42, więc wyniki walidacyjne wybranych konfiguracji
+są zawyżone przez sam wybór. Przykładowo najlepsze strojenie TCN dało AP
+0,150, a średnia z trzech ziaren wyniosła 0,141. Wszystkie przebiegi pochodzą
+z jednej rewizji kodu~\cite{validation}.
 
-Przyjęty protokół wydziela sezony 2022--2024 do uczenia, rundy 1--12
-sezonu 2025 do walidacji i rundy 13--24 tego sezonu do testu.
-Podział ma zostać utrwalony przed wykluczeniami. Nie przewiduje się
-losowego dzielenia wierszy ani ponownego uczenia na train+val.
-Część testowa pozostaje zablokowana do osobnej zgody po zamrożeniu
-konfiguracji~\cite{project}.
+Przy odsetku dodatnich 0,028 stała prognoza osiąga AP 0,028. Regresja
+logistyczna uzyskuje 0,087, LightGBM 0,141, a sieci od 0,141 (TCN)
+przez 0,147 (GRU) do 0,150 (MLP). Wartości w rozrzucie między ziarnami
+są małe (do 0,008). W porównaniu parami z LightGBM sieci są statystycznie
+nieodróżnialne w 8 z 9 przypadków: przedział ufności różnicy AP zawiera
+zero. Tylko MLP przy ziarnie 42 różni się nieznacznie na korzyść
+(różnica 0,012, przedział od 0,001 do 0,020). Regresja logistyczna jest
+gorsza od LightGBM przy wszystkich ziarnach, a stała prognoza
+wyraźnie gorsza.
 
-Wybór modelu ma wykorzystywać Average Precision (AP), opisującą jakość
-rankingu prognoz, podawaną obok częstości klasy dodatniej. Próg alarmu
-będzie wybierany na walidacji według F1, łączącego precyzję i czułość,
-i przenoszony bez zmian na test. Ocena zdarzeniowa ma uwzględniać
-wcześniejszy alarm, a nie zaliczać spóźnionego. Niepewność będzie
-wyznaczana przez losowanie ze zwracaniem całych wyścigów (bootstrap).
-Wyniki mają rozróżniać zieloną flagę, SC/VSC i szczególne reguły opon.
+Na okrążeniach przy SC lub VSC jest tylko 12 przykładów dodatnich
+w 610 okrążeniach. Ich AP jest bardzo niestabilna i nie wyciągamy z niej
+wniosków. Próg wybrany na walidacji zdominowanej przez zieloną flagę
+dla MLP i GRU nie daje w tych okrążeniach żadnych trafień.
+
+\section{Jednorazowa ocena na zbiorze testowym}
+
+Po zamrożeniu konfiguracji, modeli i progów zespół zatwierdził jedną ocenę
+na zbiorze testowym, wykonaną raz z tej samej wersji kodu, bez ponownego
+uczenia lub strojenia~\cite{test}. Test obejmuje 11 wyścigów, 12\,354 próbek
+i 301 przykładów dodatnich (odsetek 0,024).
+Tabela~\ref{tab:results} podaje wyniki jako średnie z trzech ziaren.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Wyniki modeli (średnia z ziaren 42--44). AP testowa z odchyleniem
+standardowym. Ocena zdarzeniowa dla okna $k=1$.}
+\label{tab:results}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lcccccc}
+\toprule
+Model & AP walid. & AP test & F1 walid. & F1 test & F1 zdarz. & Fałsz. alarmy \\
+ & & & & & test & na wyścig, test \\
+\midrule
+Stała & 0,028 & 0,024 $\pm$ 0,000 & 0,055 & 0,048 & 0,092 & 1069,2 \\
+Regresja log. & 0,087 & 0,095 $\pm$ 0,000 & 0,173 & 0,153 & 0,261 & 105,3 \\
+LightGBM & 0,141 & 0,109 $\pm$ 0,002 & 0,220 & 0,171 & 0,263 & 34,9 \\
+MLP & 0,150 & 0,115 $\pm$ 0,002 & 0,237 & 0,189 & 0,286 & 42,9 \\
+GRU & 0,147 & 0,113 $\pm$ 0,001 & 0,232 & 0,189 & 0,294 & 49,2 \\
+TCN & 0,141 & 0,105 $\pm$ 0,007 & 0,233 & 0,187 & 0,285 & 55,3 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Wszystkie modele poza stałą prognozą mają AP kilkukrotnie wyższe od
+odsetka dodatnich, a F1 zdarzeniowe około 0,26--0,29. Oznacza to
+umiarkowaną, ale realną zdolność wskazywania okrążeń przed zjazdem.
+Sieci dają AP 0,105--0,115, a LightGBM 0,109. Na zielonej fladze AP sieci
+wynosi 0,107--0,119. Przy 11 wyścigach przedziały ufności są szerokie.
+Sieci są nieodróżnialne od LightGBM w 8 z 9 porównań. Tylko MLP przy
+ziarnie 44 różni się nieznacznie (różnica 0,009, przedział od 0,001 do
+0,018), co przy jednym ziarnie nie ustala rankingu. Regresja logistyczna
+jest nieodróżnialna od LightGBM przy wszystkich trzech ziarnach.
+Wyraźnie gorsza jest tylko stała prognoza. Nie twierdzimy więc, że jakikolwiek
+model jest lepszy od pozostałych.
+
+W porównaniu z walidacją AP sieci i LightGBM spadła (z 0,141--0,150 do
+0,105--0,115), co zgadza się z optymistycznym obciążeniem po wyborze
+konfiguracji na walidacji. Regresja logistyczna, której nie dotyczył
+wybór, nie spadła (0,087 i 0,095), ale zmienił się też skład wyścigów.
+Liczby fałszywych alarmów różnią się mocno między ziarnami (odchylenie
+około 19 dla GRU i TCN). Okrążenia z SC i VSC mają w teście 8 przykładów
+dodatnich w 7 wyścigach, a wyścig o szczególnych regułach opon jest tylko
+jeden, więc dla tych grup nie wyciągamy wniosków.

@@ -1,9 +1,13 @@
 # F1 pit stop prediction: academic report
 
 Polish living report for the Neural Networks course, based on accepted
-application source `5ba376f904b58caf2072ce807cc822db7a90ccc6` (2026-11-09).
-The report describes the implemented data infrastructure and FastF1 audit;
-models, training and predictive evaluation have not been implemented.
+application source `1c76890244470588e5778fe38ad63579aca4f9d4` (2026-11-26,
+through T12b; the previous version covered `5ba376f` / T2). The report
+describes the data pipeline, six models, the validation study, the single locked
+test evaluation and the demo pack. The remaining work is the dashboard
+heatmap/model-comparison views, deployment and the final README/Colab.
+No local PDF build was done for this update (no TeX installation by decision):
+compile in Overleaf and inspect every page before relying on the layout.
 
 This is an independent source repository. The application is
 [lyskawson/f1-pitstop](https://github.com/lyskawson/f1-pitstop).
@@ -85,15 +89,15 @@ normally. Neither integration is an automatic background updater of this report.
 - `evidence/provenance.json`: SHA-256 identities of consulted source/evidence
   artifacts and the template, with no private machine paths.
 - `evidence/summary.json`: selected existing aggregate findings, no raw data/logs.
-- `report-state.json`: frozen application revision, covered stages, unresolved
+- `report-state.json`: documented application revision, covered stages, unresolved
   questions and exact build/visual-check status.
 
 The current PDF uses five chapters: goal/scope, data/preparation,
 methods/implementation, experiments/results, and discussion/conclusions.
 Label uncertainty and causal availability have one main home in chapter 2;
-the compact completion summary is in chapter 5. Existing software checks and
-a short future experiment plan share chapter 4. Replace plans with realized
-methods/results as work lands rather than keeping both accounts.
+the compact completion summary is in chapter 5. Software checks, the
+validation study and the single test evaluation are in chapter 4. Replace plans
+with realized methods/results as work lands rather than keeping both accounts.
 
 Write the PDF as a continuous account of the project that grows with completed
 work. Do not introduce it with a code SHA, update date or snapshot description,
@@ -109,8 +113,9 @@ Prefer short, complete sentences separated by periods to semicolons.
 
 The first 15-page version is retained in Git history at `66efab4`, with a local
 PDF/source backup in ignored `build/archive/pre-edit1/`. The current editorial
-target is 9–11 pages without changing fonts or margins. For the final report,
-18–22 pages is only a planning envelope: reserve roughly half the body for
+target was 9–11 pages without changing fonts or margins (the update through
+T12b is longer; its page count is unknown until the first Overleaf build).
+For the final report, 18–22 pages is only a planning envelope: reserve roughly half the body for
 models, experimental method, results and interpretation, and adjust when actual
 content warrants it. All course requirements take precedence over page counts.
 
@@ -137,4 +142,4 @@ binary asset, without foreign Git metadata.
 
 Local compilation, portability and page inspection are recorded in
 `report-state.json`. The source PDF is intentionally a report on work in
-progress: D2, D5, T2c, data acceptance and predictive results remain open.
+progress: the dashboard views, deployment and final documentation remain open.

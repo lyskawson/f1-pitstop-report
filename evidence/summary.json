@@ -92,5 +92,81 @@
     "ruff_check": "passed",
     "ruff_format": "passed",
     "rerun_for_report": false
+  },
+  "dataset_v1": {
+    "source": "docs/handoff/HANDOFF.md and docs/handoff/reports/accepted-work.md at 1c76890244470588e5778fe38ad63579aca4f9d4",
+    "split_races_before_exclusions": {"train": 68, "val": 12, "test": 12},
+    "samples": {
+      "train": {"races": 53, "samples": 55797, "positives": 1706},
+      "val": {"races": 10, "samples": 10415, "positives": 296},
+      "test": {"races": 11, "samples": 12354, "positives": 301}
+    },
+    "t3_training_label_audit": {
+      "positives": 1706,
+      "negatives": 54091,
+      "omitted_real_samples": 1167,
+      "omitted_by_reason": {
+        "absent_exact_t_plus_1": 1025,
+        "absent_exact_t_plus_2_exit": 61,
+        "continuous_history_without_confirmation": 78,
+        "missing_or_unrecognised_tyre_record": 2,
+        "missing_or_invalid_exit_marker": 1
+      },
+      "positive_evidence": {"compound_change": 1337, "same_compound_age_discontinuity": 369}
+    },
+    "t4d_lap_time_rel_zero_cells_first_build": 2389,
+    "test_suite_ci_at_t12_merge": 359,
+    "note": "Transcribed author-report aggregates; the report writer did not rerun the dataset build or tests. CI result for 1c76890 itself was not inspected."
+  },
+  "validation_v1": {
+    "source": "reports/validation-v1.json / .md at 1c76890244470588e5778fe38ad63579aca4f9d4",
+    "code_revision": "f91914766761844937bd1e83e77740daa5af8a17",
+    "split": "val, 10 races, prevalence 0.028",
+    "caveat": "Configs selected on val AP at seed 42; val metrics of selected configs are optimistically biased (TCN tuning AP 0.1495 vs 3-seed mean 0.141).",
+    "mean_over_seeds_42_44": {
+      "constant": {"ap": 0.028, "f1": 0.055, "event_k1_f1": 0.107, "false_alarms_per_race": 982.4},
+      "logreg": {"ap": 0.087, "f1": 0.173, "event_k1_f1": 0.270, "false_alarms_per_race": 84.7},
+      "lightgbm": {"ap": 0.141, "f1": 0.220, "event_k1_f1": 0.297, "false_alarms_per_race": 29.1},
+      "mlp": {"ap": 0.150, "f1": 0.237, "event_k1_f1": 0.337, "false_alarms_per_race": 33.333},
+      "gru": {"ap": 0.147, "f1": 0.232, "event_k1_f1": 0.332, "false_alarms_per_race": 41.6},
+      "tcn": {"ap": 0.141, "f1": 0.233, "event_k1_f1": 0.336, "false_alarms_per_race": 43.433}
+    },
+    "paired_bootstrap_vs_lightgbm": "networks tied in 8 of 9 comparisons (mlp seed 42 differs: +0.0120, CI [+0.0007, +0.0200]); logreg and constant worse at all seeds",
+    "sc_vsc": {"laps": 610, "positives": 12, "races": 8}
+  },
+  "test_v1": {
+    "source": "reports/test-v1.json / .md at 1c76890244470588e5778fe38ad63579aca4f9d4",
+    "code_revision": "75b39bc7d1c3ceaf01cd53ae904dabbaf81041f9",
+    "approval": "recorded in reports/test-v1-freeze.json; communicated by michalklamecki on 2026-11-26; evaluated once",
+    "split": "test, 11 races, 12354 laps, 301 positives, prevalence 0.024",
+    "mean_over_seeds_42_44": {
+      "constant": {"ap": 0.024, "f1": 0.048, "event_k1_f1": 0.092, "false_alarms_per_race": 1069.182},
+      "logreg": {"ap": 0.095, "f1": 0.153, "event_k1_f1": 0.261, "false_alarms_per_race": 105.273},
+      "lightgbm": {"ap": 0.109, "f1": 0.171, "event_k1_f1": 0.263, "false_alarms_per_race": 34.939},
+      "mlp": {"ap": 0.115, "f1": 0.189, "event_k1_f1": 0.286, "false_alarms_per_race": 42.879},
+      "gru": {"ap": 0.113, "f1": 0.189, "event_k1_f1": 0.294, "false_alarms_per_race": 49.242},
+      "tcn": {"ap": 0.105, "f1": 0.187, "event_k1_f1": 0.285, "false_alarms_per_race": 55.273}
+    },
+    "paired_bootstrap_vs_lightgbm": "networks tied in 8 of 9 comparisons (mlp seed 44 differs: +0.0092, CI [+0.0010, +0.0177]); logreg tied at all three seeds; constant differs",
+    "groups": {
+      "green": {"laps": 11681, "positives": 293, "races": 11},
+      "sc_vsc": {"laps": 673, "positives": 8, "races": 7},
+      "special_tyre_rule": {"laps": 1042, "positives": 40, "races": 1}
+    },
+    "green_ap_networks": {"mlp": 0.119, "gru": 0.116, "tcn": 0.107}
+  },
+  "demo_pack": {
+    "source": "demo/metadata.json at 1c76890244470588e5778fe38ad63579aca4f9d4",
+    "races": ["2025_14_R", "2025_15_R", "2025_16_R"],
+    "event_names": ["Hungarian Grand Prix", "Dutch Grand Prix", "Italian Grand Prix"],
+    "rule": "seed42_one_run_per_model v1",
+    "export_git_commit": "0b0b55e5fa32b604fc8548dd127337e89e85b8e6",
+    "payload_total_bytes": 328818,
+    "payload_total_bytes_note": "sum of git blob sizes of the five files in demo/"
+  },
+  "runs_v1_release": {
+    "url": "https://github.com/lyskawson/f1-pitstop/releases/tag/runs-v1",
+    "archive_sha256": "122b60c80561a9f32d361b2431c44b854ba16691b44d41e2acbb954bc94986f6",
+    "contents": "36 run directories (18 tuning, 18 final with the single test evaluation)"
   }
 }

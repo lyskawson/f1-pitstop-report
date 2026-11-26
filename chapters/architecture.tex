@@ -1,111 +1,157 @@
 \Chapter{Metody i realizacja}
 \label{ch:methods}
 
-\section{Przepływ danych i interfejsy}
+\section{Przepływ danych}
 
 Program jest pakietem Pythona podzielonym według etapów przetwarzania.
-Wspólny interfejs wiersza poleceń (CLI) oddziela sposób uruchamiania
-od obliczeń, a kontrakty określają formaty przekazywanych danych.
-Rysunek~\ref{fig:flow} pokazuje, gdzie kończy się działająca część
-przepływu i zaczynają etapy projektowane~\cite{project}.
+Wspólny interfejs wiersza poleceń (CLI) oddziela uruchamianie od obliczeń,
+a kontrakty określają format danych przekazywanych między etapami
+(rysunek~\ref{fig:flow})~\cite{project}.
 
 \begin{figure}[htbp]
 \centering\small
 \begin{tabular}{c}
 \fbox{\strut Dane FastF1 w lokalnej pamięci podręcznej} \\[5pt]
 $\downarrow$ \\[3pt]
-\fbox{\strut Offline: normalizacja $\to$ snapshot i manifest $\to$ weryfikacja} \\[5pt]
+\fbox{\strut Archiwum surowe z manifestem $\to$ weryfikacja offline} \\[5pt]
 $\downarrow$ \\[3pt]
-\fbox{\strut Plan: etykiety $\to$ podziały $\to$ cechy i okna $\to$ zbiór} \\[5pt]
+\fbox{\strut Podział i wykluczenia $\to$ etykiety $\to$ cechy i okna $\to$ zbiór} \\[5pt]
 $\downarrow$ \\[3pt]
-\fbox{\strut Plan: uczenie $\to$ predykcje $\to$ ocena $\to$ panel}
+\fbox{\strut Uczenie $\to$ predykcje $\to$ ocena (walidacja, jednorazowo test)} \\[5pt]
+$\downarrow$ \\[3pt]
+\fbox{\strut Paczka demonstracyjna $\to$ panel Streamlit}
 \end{tabular}
-\caption{Przepływ od źródła do planowanej prezentacji prognoz.}
+\caption{Przepływ od źródła do prezentacji prognoz.}
 \label{fig:flow}
 \end{figure}
 
-Wejściem eksportu jest pamięć podręczna zawierająca żądane sesje.
-Program normalizuje typy, zachowuje surowe okrążenia i łączy je
-z metadanymi wyścigów oraz strumieniami zdarzeń. Wyjściem jest snapshot,
-czyli nazwana i niezmienna wersja plików, wraz z manifestem opisującym
-ich pochodzenie, rozmiary, skróty SHA-256, pokrycie i powody wykluczeń.
-Podział ten pozwala oddzielić jednorazowe pozyskanie danych od ich
-wielokrotnego wykorzystania w eksperymentach.
+Eksport pakuje sesje z pamięci podręcznej do archiwum. Normalizuje typy,
+zachowuje surowe okrążenia i dołącza metadane wyścigów oraz strumienie
+zdarzeń. Manifest opisuje pochodzenie, rozmiary, skróty SHA-256, pokrycie
+i powody wykluczeń. Eksport działa wyłącznie offline: brak odpowiedzi
+w pamięci podręcznej jest błędem, więc niekompletnego wejścia nie da się
+pomylić z poprawnym zbiorem. Weryfikator działa bez FastF1 i sprawdza nie
+tylko bajty, lecz także zgodność treści: typy, klucze, znaczniki czasu
+oraz pokrycie i wykluczenia przeliczone ponownie z tabel. Zgodny skrót
+potwierdza bowiem tożsamość pliku, a nie sens jego zawartości.
 
-Eksport działa wyłącznie offline. Brak odpowiedzi
-w cache jest błędem, nawet jeśli biblioteka wewnętrznie stłumi problem
-odczytu. Niekompletnego wejścia nie można w ten sposób pomylić
-z poprawnym zbiorem. Surowe wiersze, także wygenerowane, niedokładne
-i niejednoznaczne, pozostają zachowane. Wykluczenia są metadanymi.
-Pozwala to odtworzyć konsekwencje późniejszej reguły etykiet lub
-czyszczenia bez ponownego pobierania źródła.
+Kolejne etapy czytają zweryfikowane archiwum. Polecenie budowy zbioru
+stosuje podział i wykluczenia, wyznacza etykiety, liczy cechy i okna
+oraz zapisuje próbki, tablice wejściowe i parametry standaryzacji. Każda
+próbka ma identyfikator \code{row_id}, wspólny dla tabeli próbek i obu
+tablic, więc walidacja wykrywa zamianę kolejności numerycznie poprawnych
+wierszy. Każdy przebieg uczenia zapisuje konfigurację, rewizję kodu,
+skrót danych, ziarno losowe, model, historię, predykcje i metryki.
 
-Snapshot powstaje najpierw w obszarze roboczym. Po sprawdzeniu plików
-program pakuje archiwum, rozpakowuje je i weryfikuje ponownie przed
-nadaniem docelowej nazwy. Istniejącej wersji nie zastępuje.
-Weryfikator działa niezależnie od pamięci podręcznej i biblioteki
-FastF1. Sprawdza zarówno integralność bajtów, jak
-i zgodność treści: typy, klucze, tożsamość wyścigów, znaczniki czasu
-oraz pokrycie i wykluczenia obliczone ponownie z tabel.
-To istotne, ponieważ zgodny skrót potwierdza tożsamość pliku, a nie
-sens jego zawartości.
+\section{Cechy i okna czasowe}
 
-Nie wszystkie źródła mają tę samą podstawę czasu: status toru używa
-sekund sesji, komunikaty kontroli wyścigu zachowują czas UTC,
-a zapowiedzi liczby okrążeń pozostają materiałem archiwalnym.
-Eksport nie nadaje im jeszcze znaczenia cech. Nieznany czas pobrania
-istniejącego cache jest oznaczony jako brak z wyjaśnieniem, osobno od
-czasu budowy snapshotu. Formalne domknięcie tego opisu pochodzenia
-i akceptacja danych pozostają odrębne od ukończenia kodu importu.
+Wektor wejściowy ma 15 cech w stałej kolejności. Opisują opony (wiek
+i mieszanka kodowana trzema zmiennymi 0/1), przebieg wyścigu
+(liczba wykonanych postojów, okrążenia do końca, spełnienie wymogu
+użycia dwóch mieszanek), tempo (czas okrążenia względem mediany stawki,
+degradacja w stincie), pozycję, luki do samochodów przed i za, status SC
+i VSC oraz liczbę rywali, którzy zjechali w ostatnich okrążeniach. Cechy
+liczbowe są standaryzowane statystykami z części uczącej, a zmienne 0/1 nie.
 
-\section{Reprezentacja wejść do metod}
+Modele tablicowe dostają wektor z okrążenia $t$ jako macierz
+$X_{\mathrm{tab}}\in\mathbb{R}^{N\times15}$. Modele sekwencyjne dostają okno
+15 kolejnych okrążeń $t-14,\dots,t$ tego samego kierowcy w tym samym
+wyścigu. Okno nie przekracza granicy wyścigu ani kierowcy, ale może
+obejmować wymianę opon. Krótszą historię uzupełniają zera z lewej strony
+i dodatkowy kanał \code{is_pad}, więc tensor ma kształt
+$X_{\mathrm{seq}}\in\mathbb{R}^{N\times15\times16}$. Każdy krok okna
+używa cech obliczonych w jego własnej chwili, a ostatni jest zawsze
+prawdziwym okrążeniem $t$. Testy przyczynowości przeliczają cechy
+po obcięciu wszystkich strumieni do czasu $T$ i wymagają identycznego wyniku.
 
-Kontrakty wymagają jednoznacznego powiązania okrążenia, etykiety
-i wektora wejściowego. Planowana tabela próbek oraz tablice cech mają
-wspólny identyfikator \code{row_id} w tej samej kolejności. Dzięki temu
-walidacja wykrywa również zamianę kolejności poprawnych numerycznie
-wierszy, która inaczej mogłaby przypisać cechy do niewłaściwej odpowiedzi.
+\section{Modele}
 
-Dla $N$ próbek zaplanowano macierz tablicową
-$X_{\mathrm{tab}}\in\mathbb{R}^{N\times15}$ oraz tensor sekwencyjny
-$X_{\mathrm{seq}}\in\mathbb{R}^{N\times15\times16}$.
-Pierwsza zawiera 15 cech bieżącego okrążenia. Drugi obejmuje 15
-kolejnych kroków historii i dodatkowy kanał \code{is_pad}, oznaczający
-dołożone z lewej strony zera dla krótkiej historii. Cechy mają opisywać
-opony, przebieg stintu, tempo, pozycję i kontekst stawki.
-Walidatory już sprawdzają kształty, skończoność wartości i poprawność
-dopełnienia. Z samej tablicy nie ustalą jednak, czy wszystkie kroki
-pochodzą od jednego kierowcy i kończą się na $t$. Ta własność wymaga
-przyszłej kontroli budowy okien.
+Wszystkie modele zwracają jedną wartość (logit) na próbkę, a sieci uczone są
+zwykłą funkcją straty binarnej entropii krzyżowej bez ważenia klas. Wartość
+początkowa ostatniego biasu odpowiada odsetkowi dodatnich w zbiorze
+uczącym, a więc sieć zaczyna od prognozy bazowej. Walidacja i test mają
+naturalny rozkład klas, bez próbkowania.
 
-\section{Technologie i dalsze metody}
+\begin{itemize}
+\item \textbf{Stała prognoza} zwraca odsetek dodatnich ze zbioru uczącego.
+Wyznacza poziom bez wiedzy.
+\item \textbf{Regresja logistyczna} i \textbf{LightGBM} (drzewa
+decyzyjne z wzmacnianiem gradientowym) dostają wektor z okrążenia $t$.
+LightGBM kończy uczenie, gdy AP na walidacji przestaje rosnąć.
+\item \textbf{MLP} to perceptron z dwiema warstwami ukrytymi (w konfiguracji
+końcowej 64 i 32 neurony), aktywacją ReLU i dropoutem.
+\item \textbf{GRU} to dwuwarstwowa sieć rekurencyjna na oknie 15 okrążeń.
+Prognozę wyznacza ostatni krok okna.
+\item \textbf{TCN} to przyczynowa sieć konwolucyjna z trzema blokami
+rezydualnymi i rosnącymi dylatacjami 1, 2 i 4. Dopełnienie jest tylko
+z lewej strony, więc wynik dla okrążenia $t$ nie zależy od późniejszych.
+Pole recepcyjne wynosi 29 kroków i obejmuje całe okno.
+\end{itemize}
 
-Python 3.12 i menedżer \code{uv} tworzą wspólne środowisko,
-odtwarzane z wersjonowanej blokady zależności. Tabela~\ref{tab:tech}
-wiąże najważniejsze narzędzia z ich rolą. Szczegółowe wersje i ustawienia
-uruchomienia pozostają w plikach środowiska i instrukcjach projektu.
+Sieci uczy wspólna pętla z optymalizatorem AdamW. Wybiera ona epokę
+o najwyższym AP na walidacji i zatrzymuje uczenie po ośmiu epokach bez
+poprawy. Uczenie jest deterministyczne i odbywa się na CPU, a jeden
+przebieg trwa od kilku sekund (MLP) do około dwóch minut (GRU).
+Dla każdej sieci przeszukano siatkę sześciu konfiguracji (trzy tempa
+uczenia i dwie szerokości warstw ukrytych) przy jednym ziarnie 42, a wybraną
+konfigurację uczono potem z ziarnami 42, 43 i 44. Konfiguracje końcowe
+zamrożono przed oceną na zbiorze testowym.
+
+\section{Ocena}
+
+Główną miarą jest AP, która ocenia jakość rankingu prognoz niezależnie
+od progu. Próg alarmu to wartość maksymalizująca F1 (średnią harmoniczną
+precyzji i czułości) na walidacji. Zamrażamy go i przenosimy bez zmian na test.
+Ocena zdarzeniowa pyta, czy przed zjazdem pojawił się alarm. Zjazd na okrążeniu $t^*+1$ jest
+wykryty, gdy alarm padł na końcu okrążenia $t^*$ lub jednym wcześniej
+(okno $k=1$). Alarm późniejszy nie liczy się, bo wtedy samochód jest już
+w alei. Podajemy też liczbę fałszywych alarmów na wyścig.
+Niepewność wyznacza bootstrap, czyli losowanie ze zwracaniem całych
+wyścigów (1000 powtórzeń). Porównanie dwóch modeli używa tych samych
+wylosowanych wyścigów. Jeżeli przedział ufności różnicy zawiera zero,
+uznajemy wynik za remis. Wyniki podajemy też osobno dla zielonej flagi
+i okrążeń z SC lub VSC. Jeśli AP lub F1 przekroczy 0,6, procedura
+zatrzymuje się i wymaga audytu wycieku. Żaden model nie zbliżył się
+do tej wartości.
+
+Metryki zweryfikowano na przypadkach syntetycznych z ręcznie policzonymi
+wynikami. Idealne wyniki w tych testach potwierdzają poprawność
+obliczeń, a nie jakość modeli.
+
+\section{Panel demonstracyjny}
+
+Panel w Streamlit czyta wyłącznie gotowe predykcje, bez PyTorch, LightGBM
+i FastF1. Widok wyścigu pozwala wybrać wyścig, kierowcę i model.
+Pokazuje prawdopodobieństwo zjazdu na każde okrążenie, rzeczywiste wymiany
+opon, pasma SC i VSC oraz zamrożony próg alarmu. Paczka demonstracyjna
+zawiera trzy wyścigi z części testowej (Grand Prix Węgier, Holandii
+i Włoch 2025) oraz po jednym przebiegu (ziarno 42) każdego z sześciu modeli,
+razem z metrykami, progami i skrótami SHA-256 plików. Eksport nie uczy ani
+nie ocenia niczego ponownie. Pozostałe widoki (mapa ciepła stawki i
+porównanie modeli) oraz publikacja w sieci są jeszcze do wykonania.
+
+\section{Technologie}
+
+Python 3.12 i menedżer \code{uv} tworzą wspólne środowisko odtwarzane
+z wersjonowanej blokady zależności. Tabela~\ref{tab:tech} wiąże narzędzia
+z ich rolą.
 
 \begin{table}[htbp]
 \centering\small
-\caption{Rola technologii w realizacji projektu.}
+\caption{Rola technologii w projekcie.}
 \label{tab:tech}
 \begin{tabularx}{\textwidth}{L{0.33\textwidth}Y}
 \toprule
 Technologia & Zastosowanie \\
 \midrule
-FastF1 & Odczyt źródła i audyt danych wyścigowych. \\
+FastF1 & Odczyt i audyt danych wyścigowych. \\
 pandas, NumPy, PyArrow & Przetwarzanie tabel i tablic oraz zapis Parquet. \\
 YAML, \code{uv} & Jawne konfiguracje i odtwarzanie środowiska. \\
-pytest, pytest-socket, Ruff & Testy offline oraz kontrola jakości kodu. \\
-PyTorch, scikit-learn, LightGBM & Zależności dla planowanych modeli i metryk. \\
-Streamlit & Planowana prezentacja gotowych prognoz. \\
+PyTorch & Sieci MLP, GRU i TCN oraz wspólna pętla uczenia. \\
+scikit-learn, LightGBM & Regresja logistyczna, LightGBM i metryki. \\
+pytest, pytest-socket, Ruff & Testy offline i kontrola jakości kodu. \\
+GitHub Actions & Testy i kontrola kodu przy każdym pull requeście. \\
+Streamlit & Panel prezentujący gotowe prognozy. \\
 \bottomrule
 \end{tabularx}
 \end{table}
-
-Dalsze porównanie ma objąć stały wynik równy częstości klasy dodatniej,
-regresję logistyczną i LightGBM oraz sieci neuronowe: perceptron
-wielowarstwowy (MLP), sieć rekurencyjną z komórką GRU i czasową sieć
-konwolucyjną (TCN). Metody tablicowe mają otrzymywać stan na końcu
-okrążenia, a sekwencyjne jego historię. CPU jest urządzeniem
-referencyjnym. Istniejące konfiguracje utrwalają te założenia.
